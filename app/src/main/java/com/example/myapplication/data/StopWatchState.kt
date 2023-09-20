@@ -1,4 +1,4 @@
-package com.example.myapplication.presentation
+package com.example.myapplication.data
 
 data class StopWatchState(
     val isActive: Boolean = false,
