@@ -2,6 +2,7 @@ package com.example.myapplication.services
 
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -33,22 +34,16 @@ class StopWatchService : LifecycleService() {
         when (intent?.action) {
             Actions.START.toString() -> start()
             Actions.STOP.toString() -> stopSelf()
+            Actions.RESET.toString() -> stopWatch.reset()
+            Actions.PAUSE.toString() -> stopWatch.start()
 
         }
         return super.onStartCommand(intent, flags, startId)
     }
 
     private fun start() {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
 
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
+        val onClickPendingIntent = createOnClickPendingIntent()
 
         notificationBuilder = NotificationCompat.Builder(this, "running_channel")
             .setAutoCancel(false)
@@ -56,7 +51,7 @@ class StopWatchService : LifecycleService() {
             .setSmallIcon(R.drawable.baseline_access_time_24)
             .setContentTitle("Time Management")
             .setContentText("00:00:00")
-            .setContentIntent(pendingIntent)
+            .setContentIntent(onClickPendingIntent)
 
         val notification = notificationBuilder.build()
 
@@ -65,6 +60,7 @@ class StopWatchService : LifecycleService() {
         lifecycleScope.launchWhenStarted {
             stopWatch.state.collectLatest { state ->
                 updateTime(state)
+                updateActionButton(state.isActive)
             }
         }
     }
@@ -75,7 +71,51 @@ class StopWatchService : LifecycleService() {
         notificationManager?.notify(1, notification.build())
     }
 
+    private fun updateActionButton(isActive: Boolean = false) {
+        val notificationActionText = if (isActive) "Pause" else "Start"
+        val pendingIntent = createPausePendingIntent()
+        val resetPendingIntent = createResetPendingIntent()
+        val notification = notificationBuilder
+            .clearActions()
+            .addAction(
+                R.drawable.ic_pause,
+                notificationActionText,
+                pendingIntent
+            )
+            .addAction(R.drawable.ic_restart_alt, "Reset", resetPendingIntent)
+
+        val notificationManager = getSystemService<NotificationManager>()
+        notificationManager?.notify(1, notification.build())
+    }
+
+    private fun createOnClickPendingIntent(): PendingIntent {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+
+        return PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            FLAG_IMMUTABLE
+        )
+    }
+
+    private fun createResetPendingIntent(): PendingIntent {
+        val resetIntent = Intent(this, StopWatchService::class.java).apply {
+            action = Actions.RESET.toString()
+        }
+        return PendingIntent.getService(this, 0, resetIntent, FLAG_IMMUTABLE)
+    }
+
+    private fun createPausePendingIntent(): PendingIntent {
+        val pauseIntent = Intent(this, StopWatchService::class.java).apply {
+            action = Actions.PAUSE.toString()
+        }
+        return PendingIntent.getService(this, 1, pauseIntent, FLAG_IMMUTABLE)
+    }
+
     enum class Actions {
-        START, STOP
+        START, STOP, RESET, PAUSE
     }
 }

@@ -17,6 +17,6 @@ class StopWatchViewModel @Inject constructor(
     }
 
     fun restart() {
-        stopWatch.restart()
+        stopWatch.reset()
     }
 }
