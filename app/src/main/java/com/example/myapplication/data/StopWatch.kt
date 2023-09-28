@@ -18,22 +18,20 @@ class StopWatch(private val scope: CoroutineScope) {
         scope.launch {
             if (state.value.isActive) {
                 counterJob?.cancel()
-                state.update { it.copy(isActive = false, timeAmount = "00:00:00") }
+                state.update { it.copy(isActive = false) }
             } else {
                 counterJob = launch { startCountingUp() }
-                state.update { it.copy(isActive = true) }
+                state.update { it.copy(isActive = true, timeAmount = "00:00:00") }
             }
         }
     }
 
 
-    fun restart() {
-        if (!state.value.isActive) {
-            return
-        } else {
+    fun reset() {
+        if (state.value.isActive) {
             counterJob?.cancel()
-            state.update { it.copy(isActive = false, timeAmount = "00:00:00") }
         }
+        state.update { it.copy(isActive = false, timeAmount = "00:00:00") }
     }
 
     private suspend fun startCountingUp() {
@@ -41,9 +39,7 @@ class StopWatch(private val scope: CoroutineScope) {
 
         while (true) {
             val timeAmount = Instant.now().epochSecond - startTime.epochSecond
-            val seconds = timeAmount % 60
-            val minutes = timeAmount / 60
-            val hours = timeAmount / 360
+            val time = timeAmount.toTime()
 
             delay(100)
 
@@ -51,12 +47,26 @@ class StopWatch(private val scope: CoroutineScope) {
                 it.copy(
                     timeAmount = String.format(
                         "%02d:%02d:%02d",
-                        hours,
-                        minutes,
-                        seconds
+                        time.hours,
+                        time.minutes,
+                        time.seconds
                     )
                 )
             }
         }
     }
 }
+
+fun Long.toTime(): Time {
+    val seconds = this % 60
+    val minutes = (this % 3600) / 60
+    val hours = this / 3600
+
+    return Time(hours, minutes, seconds)
+}
+
+data class Time(
+    val hours: Long,
+    val minutes: Long,
+    val seconds: Long
+)
