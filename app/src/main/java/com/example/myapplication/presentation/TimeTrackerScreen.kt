@@ -24,19 +24,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun StopWatchScreen(
+fun TimeTrackerScreen(
     timeAmount: String,
+    isActive: Boolean,
+    workingSubject: String,
+    isSubjectErrorOccurred: Boolean,
+    filteredSubjectList: List<String>,
     onStart: () -> Unit = {},
     onRestart: () -> Unit = {},
-    isActive: Boolean
+    onSubjectErrorChanged: (Boolean) -> Unit = {},
+    onWorkingSubjectChanged: (String) -> Unit = {}
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
             modifier = Modifier
@@ -59,13 +66,29 @@ fun StopWatchScreen(
                 fontWeight = FontWeight.Bold
             )
         }
+        val focusManager = LocalFocusManager.current
+        SubjectDropDown(
+            subject = workingSubject,
+            filteredSubjectList = filteredSubjectList,
+            isSubjectChangeEnabled = !isActive,
+            isSubjectErrorOccurred = isSubjectErrorOccurred,
+            onWorkingSubjectChanged = onWorkingSubjectChanged,
+            clearFocus = { focusManager.clearFocus() }
+        )
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(top = 16.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(
-                onClick = onStart,
+                onClick = {
+                    if (workingSubject.isNotBlank()) {
+                        focusManager.clearFocus(); onStart()
+                    } else {
+                        onSubjectErrorChanged(true)
+                    }
+                },
                 shape = CircleShape,
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 7.dp)
             ) {

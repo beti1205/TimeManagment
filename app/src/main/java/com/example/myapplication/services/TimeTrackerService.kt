@@ -5,23 +5,30 @@ import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Intent
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.R
-import com.example.myapplication.data.StopWatch
-import com.example.myapplication.data.StopWatchState
+import com.example.myapplication.domain.timetracker.TimeTracker
+import com.example.myapplication.domain.timetracker.TimeTrackerState
+import com.example.myapplication.domain.stopwatch.formatTime
+import com.example.myapplication.domain.stopwatch.toTime
+import com.example.myapplication.domain.usecase.GetLastWorkingSubjectsUseCase
 import com.example.myapplication.presentation.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class StopWatchService : LifecycleService() {
+class TimeTrackerService : LifecycleService() {
 
     @Inject
-    lateinit var stopWatch: StopWatch
+    lateinit var timeTracker: TimeTracker
+
+    @Inject
+    lateinit var getLastWorkingSubjectsUseCase: GetLastWorkingSubjectsUseCase
 
     private lateinit var notificationBuilder: NotificationCompat.Builder
 
@@ -31,23 +38,24 @@ class StopWatchService : LifecycleService() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d("TimeTracker", "action: ${intent?.action}")
         when (intent?.action) {
             Actions.START.toString() -> start()
             Actions.STOP.toString() -> stopSelf()
-            Actions.RESET.toString() -> stopWatch.reset()
-            Actions.PAUSE.toString() -> stopWatch.start()
+            Actions.RESET.toString() -> timeTracker.reset()
+            Actions.PAUSE.toString() -> timeTracker.start()
 
         }
         return super.onStartCommand(intent, flags, startId)
     }
 
     private fun start() {
-
         val onClickPendingIntent = createOnClickPendingIntent()
 
         notificationBuilder = NotificationCompat.Builder(this, "running_channel")
             .setAutoCancel(false)
             .setOngoing(true)
+            .setSilent(true)
             .setSmallIcon(R.drawable.baseline_access_time_24)
             .setContentTitle("Time Management")
             .setContentText("00:00:00")
@@ -58,24 +66,19 @@ class StopWatchService : LifecycleService() {
         startForeground(1, notification)
 
         lifecycleScope.launchWhenStarted {
-            stopWatch.state.collectLatest { state ->
-                updateTime(state)
-                updateActionButton(state.isActive)
+            timeTracker.state.collectLatest { state ->
+                updateState(state)
             }
         }
     }
 
-    private fun updateTime(state: StopWatchState) {
-        val notification = notificationBuilder.setContentText(state.timeAmount)
-        val notificationManager = getSystemService<NotificationManager>()
-        notificationManager?.notify(1, notification.build())
-    }
-
-    private fun updateActionButton(isActive: Boolean = false) {
-        val notificationActionText = if (isActive) "Pause" else "Start"
+    private fun updateState(state: TimeTrackerState) {
+        val notificationActionText = if (state.isActive) "Pause" else "Start"
         val pendingIntent = createPausePendingIntent()
         val resetPendingIntent = createResetPendingIntent()
-        val notification = notificationBuilder
+
+        val notification = notificationBuilder.setContentText(state.timeElapsed.toTime().formatTime())
+            .setContentTitle(state.workingSubject)
             .clearActions()
             .addAction(
                 R.drawable.ic_pause,
@@ -102,14 +105,14 @@ class StopWatchService : LifecycleService() {
     }
 
     private fun createResetPendingIntent(): PendingIntent {
-        val resetIntent = Intent(this, StopWatchService::class.java).apply {
+        val resetIntent = Intent(this, TimeTrackerService::class.java).apply {
             action = Actions.RESET.toString()
         }
         return PendingIntent.getService(this, 0, resetIntent, FLAG_IMMUTABLE)
     }
 
     private fun createPausePendingIntent(): PendingIntent {
-        val pauseIntent = Intent(this, StopWatchService::class.java).apply {
+        val pauseIntent = Intent(this, TimeTrackerService::class.java).apply {
             action = Actions.PAUSE.toString()
         }
         return PendingIntent.getService(this, 1, pauseIntent, FLAG_IMMUTABLE)

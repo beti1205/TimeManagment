@@ -10,13 +10,16 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
+import com.example.myapplication.domain.stopwatch.formatTime
+import com.example.myapplication.domain.stopwatch.toTime
 import com.example.myapplication.presentation.ui.theme.MyApplicationTheme
-import com.example.myapplication.services.StopWatchService
+import com.example.myapplication.services.TimeTrackerService
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -36,30 +39,50 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val viewModel: StopWatchViewModel by viewModels()
-                    val state by viewModel.state.collectAsState()
+                    val viewModel: TimeTrackerViewModel by viewModels()
 
-                    LaunchedEffect(key1 = state.isActive){
-                        Intent.ACTION_AIRPLANE_MODE_CHANGED
-                        Intent(applicationContext, StopWatchService::class.java).also {
-                            if (state.isActive) {
-                                it.action = StopWatchService.Actions.START.toString()
-                            } else {
-                                it.action = StopWatchService.Actions.STOP.toString()
-                            }
-                            startService(it)
-                        }
-                    }
-
-                    StopWatchScreen(
-                        timeAmount = state.timeAmount,
-                        isActive = state.isActive,
-                        onStart = viewModel::start,
-                        onRestart = viewModel::restart
-                    )
+                    Screen(viewModel)
                 }
             }
         }
+    }
+
+    @Composable
+    private fun Screen(
+        viewModel: TimeTrackerViewModel
+    ) {
+
+        val state by viewModel.state.collectAsState()
+
+        LaunchedEffect(key1 = state.isActive) {
+            Intent(applicationContext, TimeTrackerService::class.java).also {
+                if (state.isActive) {
+                    it.action = TimeTrackerService.Actions.START.toString()
+                } else {
+                    it.action = TimeTrackerService.Actions.STOP.toString()
+                }
+                startService(it)
+            }
+        }
+
+        LaunchedEffect(key1 = state.workingSubject) {
+            if (state.workingSubject.isNotBlank()) {
+                viewModel.onSubjectErrorChanged(false)
+            }
+            viewModel.clearElapsedTimeWhenSubjectChanged()
+        }
+
+        TimeTrackerScreen(
+            timeAmount = state.timeElapsed.toTime().formatTime(),
+            isActive = state.isActive,
+            workingSubject = state.workingSubject,
+            isSubjectErrorOccurred = state.isSubjectErrorOccurred,
+            filteredSubjectList = state.filteredSubjectList,
+            onStart = viewModel::start,
+            onRestart = viewModel::restart,
+            onSubjectErrorChanged = viewModel::onSubjectErrorChanged,
+            onWorkingSubjectChanged = viewModel::onWorkingSubjectChanged
+        )
     }
 }
 
