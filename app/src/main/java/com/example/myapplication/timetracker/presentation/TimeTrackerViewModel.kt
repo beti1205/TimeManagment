@@ -1,9 +1,9 @@
-package com.example.myapplication.presentation
+package com.example.myapplication.timetracker.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.myapplication.domain.timetracker.TimeTracker
-import com.example.myapplication.domain.usecase.GetAllWorkingSubjectsUseCase
+import com.example.myapplication.timetracker.domain.timetracker.TimeTracker
+import com.example.myapplication.timetracker.domain.usecases.GetAllWorkingSubjectsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

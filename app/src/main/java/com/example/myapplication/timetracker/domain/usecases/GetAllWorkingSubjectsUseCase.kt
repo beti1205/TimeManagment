@@ -1,4 +1,4 @@
-package com.example.myapplication.domain.usecase
+package com.example.myapplication.timetracker.domain.usecases
 
 import com.example.myapplication.data.TimeTrackerRepository
 import kotlinx.coroutines.flow.Flow

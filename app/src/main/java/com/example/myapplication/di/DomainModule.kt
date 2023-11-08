@@ -1,8 +1,8 @@
 package com.example.myapplication.di
 
 import com.example.myapplication.data.TimeTrackerRepository
-import com.example.myapplication.domain.usecase.GetAllWorkingSubjectsUseCase
-import com.example.myapplication.domain.usecase.GetAllWorkingSubjectsUseCaseImpl
+import com.example.myapplication.timetracker.domain.usecases.GetAllWorkingSubjectsUseCase
+import com.example.myapplication.timetracker.domain.usecases.GetAllWorkingSubjectsUseCaseImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

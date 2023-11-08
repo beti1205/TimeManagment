@@ -6,8 +6,8 @@ import com.example.myapplication.common.Database
 import com.example.myapplication.common.MIGRATION_1_2
 import com.example.myapplication.data.TimeTrackerRepository
 import com.example.myapplication.data.TimeTrackerRepositoryImpl
-import com.example.myapplication.domain.usecase.GetLastWorkingSubjectsUseCase
-import com.example.myapplication.domain.usecase.GetLastWorkingSubjectsUseCaseImpl
+import com.example.myapplication.timetracker.domain.usecases.GetLastWorkingSubjectsUseCase
+import com.example.myapplication.timetracker.domain.usecases.GetLastWorkingSubjectsUseCaseImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

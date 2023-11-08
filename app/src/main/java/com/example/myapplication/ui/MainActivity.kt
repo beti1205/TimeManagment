@@ -1,4 +1,4 @@
-package com.example.myapplication.presentation
+package com.example.myapplication.ui
 
 import android.Manifest
 import android.content.Intent
@@ -16,10 +16,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
-import com.example.myapplication.domain.stopwatch.formatTime
-import com.example.myapplication.domain.stopwatch.toTime
-import com.example.myapplication.presentation.ui.theme.MyApplicationTheme
+import com.example.myapplication.timetracker.domain.stopwatch.formatTime
+import com.example.myapplication.timetracker.domain.stopwatch.toTime
+import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.services.TimeTrackerService
+import com.example.myapplication.timetracker.presentation.TimeTrackerScreen
+import com.example.myapplication.timetracker.presentation.TimeTrackerViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

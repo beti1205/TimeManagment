@@ -1,4 +1,4 @@
-package com.example.myapplication.domain.stopwatch
+package com.example.myapplication.timetracker.domain.stopwatch
 
 import java.time.Instant
 

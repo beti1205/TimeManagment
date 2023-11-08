@@ -1,4 +1,4 @@
-package com.example.myapplication.presentation
+package com.example.myapplication.timetracker.presentation.components
 
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.text.KeyboardOptions

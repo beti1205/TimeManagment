@@ -1,4 +1,4 @@
-package com.example.myapplication.presentation
+package com.example.myapplication.timetracker.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.timetracker.presentation.components.SubjectDropDown
 
 @Composable
 fun TimeTrackerScreen(

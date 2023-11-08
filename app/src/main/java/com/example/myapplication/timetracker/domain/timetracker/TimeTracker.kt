@@ -1,8 +1,8 @@
-package com.example.myapplication.domain.timetracker
+package com.example.myapplication.timetracker.domain.timetracker
 
 import com.example.myapplication.data.TimeTrackerEntity
 import com.example.myapplication.data.TimeTrackerRepository
-import com.example.myapplication.domain.stopwatch.StopWatch
+import com.example.myapplication.timetracker.domain.stopwatch.StopWatch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
