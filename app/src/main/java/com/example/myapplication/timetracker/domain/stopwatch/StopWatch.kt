@@ -1,4 +1,4 @@
-package com.example.myapplication.data
+package com.example.myapplication.timetracker.domain.stopwatch
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -7,8 +7,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class StopWatch(private val scope: CoroutineScope) {
+@Singleton
+class StopWatch @Inject constructor(private val scope: CoroutineScope) {
 
     val state = MutableStateFlow(StopWatchState())
 
@@ -18,10 +21,10 @@ class StopWatch(private val scope: CoroutineScope) {
         scope.launch {
             if (state.value.isActive) {
                 counterJob?.cancel()
-                state.update { it.copy(isActive = false) }
+                state.update { it.copy(isActive = false, isTimeTrackingFinished = true) }
             } else {
                 counterJob = launch { startCountingUp() }
-                state.update { it.copy(isActive = true, timeAmount = "00:00:00") }
+                state.update { it.copy(isActive = true, isTimeTrackingFinished = false) }
             }
         }
     }
@@ -31,30 +34,42 @@ class StopWatch(private val scope: CoroutineScope) {
         if (state.value.isActive) {
             counterJob?.cancel()
         }
-        state.update { it.copy(isActive = false, timeAmount = "00:00:00") }
+        state.update { it.copy(isActive = false, timeElapsed = 0L, isTimeTrackingFinished = false) }
     }
 
     private suspend fun startCountingUp() {
-        val startTime = Instant.now()
+        var startTime = Instant.now()
+
+        state.update { it.copy(startTime = startTime) }
 
         while (true) {
             val timeAmount = Instant.now().epochSecond - startTime.epochSecond
-            val time = timeAmount.toTime()
+            startTime = Instant.now()
+            val timeElapsed = state.value.timeElapsed + timeAmount
 
-            delay(100)
+            delay(1000)
 
             state.update {
                 it.copy(
-                    timeAmount = String.format(
-                        "%02d:%02d:%02d",
-                        time.hours,
-                        time.minutes,
-                        time.seconds
-                    )
+                    timeElapsed = timeElapsed,
+                    endTime = startTime
                 )
             }
         }
     }
+
+    fun clearTime(){
+        state.update { it.copy(timeElapsed = 0L) }
+    }
+}
+
+fun Time.formatTime(): String{
+    return String.format(
+        "%02d:%02d:%02d",
+        this.hours,
+        this.minutes,
+        this.seconds
+    )
 }
 
 fun Long.toTime(): Time {
