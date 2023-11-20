@@ -13,5 +13,6 @@ data class TimeTrackerEntity(
     val timeElapsed: Long,
     val startTime: Instant?,
     val endTime: Instant?,
-    val workingSubject: String
+    val workingSubject: String,
+    val date: String
 )

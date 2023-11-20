@@ -7,5 +7,6 @@ data class StopWatchState(
     val timeElapsed: Long = 0L,
     val startTime: Instant? = null,
     val endTime: Instant? = null,
-    val isTimeTrackingFinished: Boolean = false
+    val isTimeTrackingFinished: Boolean = false,
+    val date: String = ""
 )
