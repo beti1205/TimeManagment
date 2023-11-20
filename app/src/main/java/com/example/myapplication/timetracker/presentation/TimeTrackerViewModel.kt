@@ -23,12 +23,12 @@ class TimeTrackerViewModel @Inject constructor(
 
     private val isSubjectErrorOccurred: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-    private val subjectList: StateFlow<List<String>> = getAllWorkingSubjectsUseCase()
+    private val subjects: StateFlow<List<String>> = getAllWorkingSubjectsUseCase()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     val state: StateFlow<TimeTrackerScreenState> = combine(
         timeTrackerState,
-        subjectList,
+        subjects,
         isSubjectErrorOccurred
     ) { timeTrackerState, subjects, isSubjectError ->
         val filteredSubjects = subjects
@@ -60,12 +60,12 @@ class TimeTrackerViewModel @Inject constructor(
         timeTracker.onWorkingSubjectChanged(workingSubject)
     }
 
-    fun onSubjectErrorChanged(isisSubjectErrorOccurred: Boolean) {
-        this.isSubjectErrorOccurred.update { isisSubjectErrorOccurred }
+    fun onSubjectErrorChanged(isSubjectErrorOccurred: Boolean) {
+        this.isSubjectErrorOccurred.update { isSubjectErrorOccurred }
     }
 
     fun clearElapsedTimeWhenSubjectChanged() {
-        if (subjectList.value.isNotEmpty() && state.value.workingSubject != subjectList.value.last()) {
+        if (subjects.value.isNotEmpty() && state.value.workingSubject != subjects.value.last()) {
             timeTracker.clearTime()
         }
     }

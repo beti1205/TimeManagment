@@ -14,7 +14,7 @@ interface TimeTrackerDao {
     @Query("SELECT workingSubject FROM timetrackerentity")
     fun getAllWorkingSubjects(): Flow<List<String>>
 
-    @Query("SELECT * FROM timetrackerentity ")
+    @Query("SELECT * FROM timetrackerentity ORDER BY id DESC ")
     fun getAllTimeTrackerEntity(): Flow<List<TimeTrackerEntity>>
 
     @Query("SELECT workingSubject FROM timetrackerentity WHERE id=(SELECT max(id) FROM timetrackerentity)")

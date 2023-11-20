@@ -22,7 +22,8 @@ data class TimeTrackerState(
     val startTime: Instant? = null,
     val endTime: Instant? = null,
     val workingSubject: String = "",
-    val isTimeTrackingFinished: Boolean = false
+    val isTimeTrackingFinished: Boolean = false,
+    val date: String = ""
 )
 
 @Singleton
@@ -43,7 +44,8 @@ class TimeTracker @Inject constructor(
                     startTime = startTime,
                     endTime = endTime,
                     isTimeTrackingFinished = isTimeTrackingFinished,
-                    workingSubject = subject
+                    workingSubject = subject,
+                    date = date
                 )
             }
         }
@@ -61,7 +63,8 @@ class TimeTracker @Inject constructor(
                                 timeElapsed = state.timeElapsed,
                                 startTime = state.startTime,
                                 endTime = state.endTime,
-                                workingSubject = workingSubject.value
+                                workingSubject = workingSubject.value,
+                                date = state.date
                             )
                         )
                     }
