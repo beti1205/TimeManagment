@@ -4,6 +4,7 @@
     
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
 
     <application
         android:name=".TimeManagementApp"
@@ -20,7 +21,6 @@
             android:name=".ui.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
-            android:label="@string/app_name"
             android:theme="@style/Theme.MyApplication">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,7 +28,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".services.TimeTrackerService"/>
+        <service
+            android:name=".services.TimeTrackerService"
+            android:foregroundServiceType="specialUse">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="explanation_for_special_use"/>
+        </service>
     </application>
 
 </manifest>
