@@ -63,10 +63,4 @@ class TimeTrackerViewModel @Inject constructor(
     fun onSubjectErrorChanged(isSubjectErrorOccurred: Boolean) {
         this.isSubjectErrorOccurred.update { isSubjectErrorOccurred }
     }
-
-    fun clearElapsedTimeWhenSubjectChanged() {
-        if (subjects.value.isNotEmpty() && state.value.workingSubject != subjects.value.last()) {
-            timeTracker.clearTime()
-        }
-    }
 }

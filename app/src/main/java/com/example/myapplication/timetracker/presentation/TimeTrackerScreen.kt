@@ -62,7 +62,6 @@ fun TimeTrackerScreen(
         if (state.workingSubject.isNotBlank()) {
             viewModel.onSubjectErrorChanged(false)
         }
-        viewModel.clearElapsedTimeWhenSubjectChanged()
     }
 
     TimeTrackerScreen(

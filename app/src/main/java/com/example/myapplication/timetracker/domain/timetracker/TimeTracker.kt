@@ -76,8 +76,6 @@ class TimeTracker @Inject constructor(
 
     fun reset() = stopWatch.reset()
 
-    fun clearTime() = stopWatch.clearTime()
-
     fun onWorkingSubjectChanged(workingSubject: String) {
         this.workingSubject.update { workingSubject }
     }

@@ -22,10 +22,21 @@ class StopWatch @Inject constructor(private val scope: CoroutineScope) {
         scope.launch {
             if (state.value.isActive) {
                 counterJob?.cancel()
-                state.update { it.copy(isActive = false, isTimeTrackingFinished = true) }
+                state.update {
+                    it.copy(
+                        isActive = false,
+                        isTimeTrackingFinished = true
+                    )
+                }
             } else {
                 counterJob = launch { startCountingUp() }
-                state.update { it.copy(isActive = true, isTimeTrackingFinished = false) }
+                state.update {
+                    it.copy(
+                        isActive = true,
+                        timeElapsed = 0L,
+                        isTimeTrackingFinished = false
+                    )
+                }
             }
         }
     }
@@ -58,13 +69,9 @@ class StopWatch @Inject constructor(private val scope: CoroutineScope) {
             }
         }
     }
-
-    fun clearTime(){
-        state.update { it.copy(timeElapsed = 0L) }
-    }
 }
 
-fun Time.formatTime(): String{
+fun Time.formatTime(): String {
     return String.format(
         "%02d:%02d:%02d",
         this.hours,
