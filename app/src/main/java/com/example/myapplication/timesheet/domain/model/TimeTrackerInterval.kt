@@ -3,7 +3,7 @@ package com.example.myapplication.timesheet.domain.model
 import com.example.myapplication.data.TimeTrackerEntity
 import java.time.Instant
 
-data class TimeTrackerIntervals(
+data class TimeTrackerInterval(
     val timeElapsed: Long,
     val startTime: Instant?,
     val endTime: Instant?,
@@ -11,8 +11,8 @@ data class TimeTrackerIntervals(
     val date: String
 )
 
-fun TimeTrackerEntity.toTimeTrackerIntervals(): TimeTrackerIntervals{
-    return TimeTrackerIntervals(
+fun TimeTrackerEntity.toTimeTrackerInterval(): TimeTrackerInterval{
+    return TimeTrackerInterval(
         timeElapsed = timeElapsed,
         startTime = startTime,
         endTime = endTime,
