@@ -1,81 +1,60 @@
 package com.example.myapplication.timesheet.presentation
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.myapplication.timesheet.domain.usecases.IntervalsListItem
-import com.example.myapplication.timetracker.domain.stopwatch.formatTime
-import com.example.myapplication.timetracker.domain.stopwatch.toTime
-import com.example.myapplication.utils.formatToTime
+import com.example.myapplication.timesheet.domain.model.TimeTrackerInterval
+import com.example.myapplication.timesheet.domain.usecases.DaySection
+import com.example.myapplication.timesheet.presentation.components.DaySectionHeader
+import com.example.myapplication.timesheet.presentation.components.DaySectionIntervals
+import java.time.Instant
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimesheetScreen(
     viewModel: TimesheetViewModel = hiltViewModel()
 ) {
-
     val state by viewModel.state.collectAsState()
 
+    TimesheetScreen(
+        daySections = state.daySections
+    )
+}
+
+@Composable
+fun TimesheetScreen(
+    daySections: List<DaySection>
+) {
+    TimeIntervalsList(daySections = daySections)
+}
+
+@Composable
+private fun TimeIntervalsList(daySections: List<DaySection>) {
+    val collapsedState = remember(daySections) { daySections.map { false }.toMutableStateList() }
+
     LazyColumn(contentPadding = PaddingValues(16.dp)) {
-        items(state) { item ->
-            when (item) {
-                is IntervalsListItem.Header -> {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ListItem(
-                        headlineText = { Text(item.date) },
-                        shadowElevation = 2.dp,
-                        colors = ListItemDefaults.colors(
-                            containerColor = Color.LightGray
-                        ),
-                        trailingContent = { Text(item.timeAmount) }
-                    )
+        daySections.forEachIndexed { i, daySection ->
+            val collapsed = collapsedState[i]
 
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
+            item(key = "header_$i") {
+                DaySectionHeader(
+                    daySection = daySection,
+                    index = i,
+                    collapsed = collapsed,
+                    collapsedState = collapsedState
+                )
+            }
 
-                is IntervalsListItem.Interval -> {
-                    val interval = item.interval
-                    val startTime = interval.startTime
-                    val endTime = interval.endTime
-
-                    if (startTime != null && endTime != null) {
-                        ListItem(
-                            headlineText = {
-                                Text(
-                                    text = interval.workingSubject,
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            },
-                            supportingText = {
-                                Text(
-                                    text = startTime.formatToTime() + " - " + endTime.formatToTime()
-                                )
-                            },
-                            trailingContent = {
-                                Text(
-                                    text = interval.timeElapsed.toTime().formatTime()
-                                )
-                            },
-                            shadowElevation = 2.dp
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
+            if (!collapsed) {
+                items(daySection.timeIntervals) { timeInterval ->
+                    DaySectionIntervals(timeInterval)
                 }
             }
         }
@@ -85,5 +64,15 @@ fun TimesheetScreen(
 @Preview
 @Composable
 fun TimeSheetScreenPreview() {
-    TimesheetScreen()
+    TimesheetScreen(daySections = listOf(DaySection(
+        headerDate = "Thu, Nov30",
+        headerTimeAmount = "01:59:06",
+        timeIntervals = listOf(TimeTrackerInterval(
+            timeElapsed = 7,
+            workingSubject = "Upgrade SDK",
+            date = "Thu, Nov30",
+            startTime = Instant.now(),
+            endTime = Instant.now()
+        ))
+    )))
 }
