@@ -19,4 +19,7 @@ interface TimeTrackerDao {
 
     @Query("SELECT workingSubject FROM timetrackerentity WHERE id=(SELECT max(id) FROM timetrackerentity)")
     fun getLastWorkingSubject(): Flow<String>
+
+    @Query("DELETE FROM timetrackerentity WHERE id = :id")
+    suspend fun deleteTimeInterval(id: Int)
 }

@@ -9,6 +9,8 @@ interface TimeTrackerRepository {
     fun getAllWorkingSubject(): Flow<List<String>>
     fun getAllTimeTrackerEntity(): Flow<List<TimeTrackerEntity>>
     fun getLastWorkingSubject(): Flow<String>
+
+    suspend fun deleteTimeInterval(id: Int)
 }
 
 class TimeTrackerRepositoryImpl @Inject constructor(
@@ -28,5 +30,9 @@ class TimeTrackerRepositoryImpl @Inject constructor(
 
     override fun getLastWorkingSubject(): Flow<String> {
         return timeTrackerDao.getLastWorkingSubject()
+    }
+
+    override suspend fun deleteTimeInterval(id: Int) {
+        return timeTrackerDao.deleteTimeInterval(id)
     }
 }

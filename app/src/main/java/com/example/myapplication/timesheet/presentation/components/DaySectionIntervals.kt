@@ -24,7 +24,8 @@ import com.example.myapplication.utils.formatToTime
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun DaySectionIntervals(
-    timeInterval: TimeTrackerInterval
+    timeInterval: TimeTrackerInterval,
+    onDeleteClicked: (Int) -> Unit
 ) {
     if (timeInterval.startTime != null && timeInterval.endTime != null) {
         ListItem(
@@ -47,7 +48,7 @@ fun DaySectionIntervals(
                         text = timeInterval.timeElapsed.toTime().formatTime()
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = { onDeleteClicked(timeInterval.id) }) {
                         Icon(
                             imageVector = Icons.Outlined.Delete,
                             contentDescription = null

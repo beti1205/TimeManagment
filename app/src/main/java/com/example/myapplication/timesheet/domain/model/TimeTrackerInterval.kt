@@ -4,6 +4,7 @@ import com.example.myapplication.data.TimeTrackerEntity
 import java.time.Instant
 
 data class TimeTrackerInterval(
+    val id: Int,
     val timeElapsed: Long,
     val startTime: Instant?,
     val endTime: Instant?,
@@ -13,6 +14,7 @@ data class TimeTrackerInterval(
 
 fun TimeTrackerEntity.toTimeTrackerInterval(): TimeTrackerInterval{
     return TimeTrackerInterval(
+        id = id,
         timeElapsed = timeElapsed,
         startTime = startTime,
         endTime = endTime,

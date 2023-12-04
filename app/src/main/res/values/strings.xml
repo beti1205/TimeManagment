@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="delete_warning_title">Are you sure?</string>
+    <string name="delete_warning_body">This operation cannot be reverted</string>
+    <string name="delete_confirm_button">Confirm</string>
+    <string name="delete_dismiss_button">Dismiss</string>
+    <string name="subject">Subject</string>
+    <string name="timesheet">Timesheet</string>
 </resources>
