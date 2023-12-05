@@ -30,9 +30,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.myapplication.R
 import com.example.myapplication.services.TimeTrackerService
 import com.example.myapplication.timetracker.domain.stopwatch.formatTime
 import com.example.myapplication.timetracker.domain.stopwatch.toTime
@@ -158,7 +160,7 @@ fun TimeTrackerScreen(
             }
         }
         Button(onClick = onNavigateToTimeSheet) {
-            Text(text = "Time sheet")
+            Text(text = stringResource(R.string.timesheet))
         }
     }
 }

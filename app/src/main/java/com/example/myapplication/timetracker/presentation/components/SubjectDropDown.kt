@@ -15,11 +15,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.myapplication.R
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,7 +54,7 @@ fun SubjectDropDown(
             value = subject,
             onValueChange = onWorkingSubjectChanged,
             isError = isSubjectErrorOccurred,
-            label = { Text("Subject", fontWeight = FontWeight.Bold) },
+            label = { Text(text = stringResource(R.string.subject), fontWeight = FontWeight.Bold) },
             trailingIcon = { TrailingIcon(expanded = expanded) },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
         )

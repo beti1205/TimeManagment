@@ -1,6 +1,8 @@
 package com.example.myapplication.di
 
 import com.example.myapplication.data.TimeTrackerRepository
+import com.example.myapplication.timesheet.domain.usecases.DeleteTimeIntervalUseCase
+import com.example.myapplication.timesheet.domain.usecases.DeleteTimeIntervalUseCaseImpl
 import com.example.myapplication.timesheet.domain.usecases.GetTimeTrackerIntervalsUseCase
 import com.example.myapplication.timesheet.domain.usecases.GetTimeTrackerIntervalsUseCaseImpl
 import com.example.myapplication.timetracker.domain.usecases.GetAllWorkingSubjectsUseCase
@@ -21,5 +23,10 @@ object DomainModule {
     @Provides
     fun getTimeTrackerIntervalsUseCase(repository: TimeTrackerRepository): GetTimeTrackerIntervalsUseCase{
         return GetTimeTrackerIntervalsUseCaseImpl(repository)
+    }
+
+    @Provides
+    fun deleteTimeIntervalUseCase(repository: TimeTrackerRepository): DeleteTimeIntervalUseCase{
+        return DeleteTimeIntervalUseCaseImpl(repository)
     }
 }
