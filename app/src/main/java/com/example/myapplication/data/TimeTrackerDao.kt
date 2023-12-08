@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
+import java.time.Instant
 
 @Dao
 interface TimeTrackerDao {
@@ -22,4 +23,7 @@ interface TimeTrackerDao {
 
     @Query("DELETE FROM timetrackerentity WHERE id = :id")
     suspend fun deleteTimeInterval(id: Int)
+
+    @Query("UPDATE timetrackerentity SET workingSubject = :subject, startTime = :startTime, endTime = :endTime WHERE id = :id ")
+    suspend fun updateTimeInterval(id: Int, subject: String, startTime: Instant, endTime: Instant)
 }

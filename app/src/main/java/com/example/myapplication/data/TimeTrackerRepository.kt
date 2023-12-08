@@ -1,6 +1,7 @@
 package com.example.myapplication.data
 
 import kotlinx.coroutines.flow.Flow
+import java.time.Instant
 import javax.inject.Inject
 
 interface TimeTrackerRepository {
@@ -9,8 +10,9 @@ interface TimeTrackerRepository {
     fun getAllWorkingSubject(): Flow<List<String>>
     fun getAllTimeTrackerEntity(): Flow<List<TimeTrackerEntity>>
     fun getLastWorkingSubject(): Flow<String>
-
     suspend fun deleteTimeInterval(id: Int)
+    suspend fun updateTimeInterval(id: Int, subject: String, startTime: Instant, endTime: Instant)
+
 }
 
 class TimeTrackerRepositoryImpl @Inject constructor(
@@ -34,5 +36,14 @@ class TimeTrackerRepositoryImpl @Inject constructor(
 
     override suspend fun deleteTimeInterval(id: Int) {
         return timeTrackerDao.deleteTimeInterval(id)
+    }
+
+    override suspend fun updateTimeInterval(id: Int, subject: String, startTime: Instant, endTime: Instant) {
+        return timeTrackerDao.updateTimeInterval(
+            id = id,
+            subject = subject,
+            startTime = startTime,
+            endTime = endTime
+        )
     }
 }

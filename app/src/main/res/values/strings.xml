@@ -3,7 +3,13 @@
     <string name="delete_warning_title">Are you sure?</string>
     <string name="delete_warning_body">This operation cannot be reverted</string>
     <string name="delete_confirm_button">Confirm</string>
-    <string name="delete_dismiss_button">Dismiss</string>
+    <string name="delete_cancel_button">Cancel</string>
     <string name="subject">Subject</string>
     <string name="timesheet">Timesheet</string>
+    <string name="delete_menu_item_label">Delete</string>
+    <string name="edit_menu_item_label">Edit</string>
+    <string name="edit_dialog_save_button">Save</string>
+    <string name="edit_dialog_cancel_button">Cancel</string>
+    <string name="edit_dialog_start_time_text_field">Start time</string>
+    <string name="edit_dialog_end_time_text_field">End time</string>
 </resources>
