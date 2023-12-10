@@ -15,7 +15,7 @@ data class TimeTrackerInterval(
 fun TimeTrackerEntity.toTimeTrackerInterval(): TimeTrackerInterval{
     return TimeTrackerInterval(
         id = id,
-        timeElapsed = timeElapsed,
+        timeElapsed = endTime!!.epochSecond - startTime!!.epochSecond,
         startTime = startTime,
         endTime = endTime,
         workingSubject = workingSubject,

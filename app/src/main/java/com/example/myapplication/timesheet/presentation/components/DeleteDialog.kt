@@ -27,7 +27,7 @@ fun DeleteDialog(
         },
         dismissButton = {
             Button(onClick = onDismissRequest) {
-                Text(stringResource(R.string.delete_dismiss_button))
+                Text(stringResource(R.string.delete_cancel_button))
             }
         }
     )

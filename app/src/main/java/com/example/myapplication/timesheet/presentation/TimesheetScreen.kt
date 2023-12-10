@@ -18,6 +18,7 @@ import com.example.myapplication.timesheet.domain.usecases.DaySection
 import com.example.myapplication.timesheet.presentation.components.DaySectionHeader
 import com.example.myapplication.timesheet.presentation.components.DaySectionIntervals
 import com.example.myapplication.timesheet.presentation.components.DeleteDialog
+import com.example.myapplication.timesheet.presentation.components.EditDialog
 import java.time.Instant
 
 @Composable
@@ -28,21 +29,47 @@ fun TimesheetScreen(
 
     TimesheetScreen(
         daySections = state.daySections,
-        onDeleteTimeInterval = viewModel::deleteTimeInterval
+        editDialogState = state.editIntervalDialogState,
+        onDeleteTimeInterval = viewModel::deleteTimeInterval,
+        onSaveClicked = viewModel::onSaveClicked,
+        onSubjectChanged = viewModel::onSubjectChanged,
+        onStartTimeChanged = viewModel::onStartTimeChanged,
+        onEndTimeChanged = viewModel::onEndTimeChanged,
+        onEditClicked = viewModel::onEditClicked,
+        onDismissEditDialog = viewModel::onDismissEditDialog
     )
 }
 
 @Composable
 fun TimesheetScreen(
     daySections: List<DaySection>,
-    onDeleteTimeInterval: (Int) -> Unit
+    editDialogState: EditIntervalDialogState?,
+    onDeleteTimeInterval: (Int) -> Unit,
+    onSaveClicked: () -> Unit,
+    onSubjectChanged: (String) -> Unit,
+    onStartTimeChanged: (String) -> Unit,
+    onEndTimeChanged: (String) -> Unit,
+    onEditClicked: (Int) -> Unit,
+    onDismissEditDialog: () -> Unit
 ) {
     var idToBeDeleted: Int? by remember { mutableStateOf(null) }
 
     TimeIntervalsList(
         daySections = daySections,
-        onDeleteClicked = { idToBeDeleted = it }
+        onDeleteClicked = { idToBeDeleted = it },
+        onEditClicked = onEditClicked
     )
+
+    editDialogState?.let { state ->
+        EditDialog(
+            state = state,
+            onDismissRequest = onDismissEditDialog,
+            onSaveClicked = onSaveClicked,
+            onStartTimeChanged = onStartTimeChanged,
+            onEndTimeChanged = onEndTimeChanged,
+            onSubjectChanged = onSubjectChanged
+        )
+    }
 
     idToBeDeleted?.let { id ->
         DeleteDialog(
@@ -55,7 +82,8 @@ fun TimesheetScreen(
 @Composable
 private fun TimeIntervalsList(
     daySections: List<DaySection>,
-    onDeleteClicked: (Int) -> Unit
+    onDeleteClicked: (Int) -> Unit,
+    onEditClicked: (Int) -> Unit
 ) {
     val collapsedState = remember(daySections) { daySections.map { false }.toMutableStateList() }
 
@@ -76,7 +104,8 @@ private fun TimeIntervalsList(
                 items(daySection.timeIntervals) { timeInterval ->
                     DaySectionIntervals(
                         timeInterval = timeInterval,
-                        onDeleteClicked = onDeleteClicked
+                        onDeleteClicked = onDeleteClicked,
+                        onEditClicked = onEditClicked
                     )
                 }
             }
@@ -85,24 +114,39 @@ private fun TimeIntervalsList(
 }
 
 
-
 @Preview
 @Composable
 fun TimeSheetScreenPreview() {
-    TimesheetScreen(daySections = listOf(
-        DaySection(
-            headerDate = "Thu, Nov30",
-            headerTimeAmount = "01:59:06",
-            timeIntervals = listOf(
-                TimeTrackerInterval(
-                    id = 1,
-                    timeElapsed = 7,
-                    workingSubject = "Upgrade SDK",
-                    date = "Thu, Nov30",
-                    startTime = Instant.now(),
-                    endTime = Instant.now()
+    TimesheetScreen(
+        daySections = listOf(
+            DaySection(
+                headerDate = "Thu, Nov30",
+                headerTimeAmount = "01:59:06",
+                timeIntervals = listOf(
+                    TimeTrackerInterval(
+                        id = 1,
+                        timeElapsed = 7,
+                        workingSubject = "Upgrade SDK",
+                        date = "Thu, Nov30",
+                        startTime = Instant.now(),
+                        endTime = Instant.now()
+                    )
                 )
             )
-        )
-    ), onDeleteTimeInterval = {})
+        ),
+        editDialogState = EditIntervalDialogState(
+            id = 1,
+            subject = "Upgrade SDK",
+            startTime = "01:59:06",
+            endTime = "02:59:06",
+            date = "Thu, Nov30"
+        ),
+        onDeleteTimeInterval = {},
+        onSaveClicked = {},
+        onSubjectChanged = {},
+        onStartTimeChanged = {},
+        onEndTimeChanged = {},
+        onEditClicked = {},
+        onDismissEditDialog = {}
+    )
 }

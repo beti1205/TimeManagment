@@ -5,6 +5,10 @@ import com.example.myapplication.timesheet.domain.usecases.DeleteTimeIntervalUse
 import com.example.myapplication.timesheet.domain.usecases.DeleteTimeIntervalUseCaseImpl
 import com.example.myapplication.timesheet.domain.usecases.GetTimeTrackerIntervalsUseCase
 import com.example.myapplication.timesheet.domain.usecases.GetTimeTrackerIntervalsUseCaseImpl
+import com.example.myapplication.timesheet.domain.usecases.TimeValidator
+import com.example.myapplication.timesheet.domain.usecases.TimeValidatorImpl
+import com.example.myapplication.timesheet.domain.usecases.UpdateTimeIntervalUseCase
+import com.example.myapplication.timesheet.domain.usecases.UpdateTimeIntervalUseCaseImpl
 import com.example.myapplication.timetracker.domain.usecases.GetAllWorkingSubjectsUseCase
 import com.example.myapplication.timetracker.domain.usecases.GetAllWorkingSubjectsUseCaseImpl
 import dagger.Module
@@ -21,12 +25,22 @@ object DomainModule {
     }
 
     @Provides
-    fun getTimeTrackerIntervalsUseCase(repository: TimeTrackerRepository): GetTimeTrackerIntervalsUseCase{
+    fun getTimeTrackerIntervalsUseCase(repository: TimeTrackerRepository): GetTimeTrackerIntervalsUseCase {
         return GetTimeTrackerIntervalsUseCaseImpl(repository)
     }
 
     @Provides
-    fun deleteTimeIntervalUseCase(repository: TimeTrackerRepository): DeleteTimeIntervalUseCase{
+    fun deleteTimeIntervalUseCase(repository: TimeTrackerRepository): DeleteTimeIntervalUseCase {
         return DeleteTimeIntervalUseCaseImpl(repository)
+    }
+
+    @Provides
+    fun updateTimeIntervalUseCase(repository: TimeTrackerRepository): UpdateTimeIntervalUseCase {
+        return UpdateTimeIntervalUseCaseImpl(repository)
+    }
+
+    @Provides
+    fun timeValidator(): TimeValidator {
+        return TimeValidatorImpl()
     }
 }

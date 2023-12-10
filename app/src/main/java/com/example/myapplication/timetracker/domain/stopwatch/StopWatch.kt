@@ -1,6 +1,6 @@
 package com.example.myapplication.timetracker.domain.stopwatch
 
-import com.example.myapplication.utils.formatToDate
+import com.example.myapplication.utils.formatToLongDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -52,7 +52,7 @@ class StopWatch @Inject constructor(private val scope: CoroutineScope) {
     private suspend fun startCountingUp() {
         var startTime = Instant.now()
 
-        state.update { it.copy(startTime = startTime, date = startTime.formatToDate()) }
+        state.update { it.copy(startTime = startTime, date = startTime.formatToLongDate()) }
 
         while (true) {
             val timeAmount = Instant.now().epochSecond - startTime.epochSecond

@@ -60,7 +60,6 @@ class TimeTracker @Inject constructor(
                         val state = stopWatch.state.value
                         repository.insert(
                             TimeTrackerEntity(
-                                timeElapsed = state.timeElapsed,
                                 startTime = state.startTime,
                                 endTime = state.endTime,
                                 workingSubject = workingSubject.value,
