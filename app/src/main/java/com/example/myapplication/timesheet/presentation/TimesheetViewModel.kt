@@ -4,9 +4,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.timesheet.domain.usecases.DeleteTimeIntervalUseCase
 import com.example.myapplication.timesheet.domain.usecases.GetTimeTrackerIntervalsUseCase
+import com.example.myapplication.timesheet.domain.usecases.TimeIntervalParameters
 import com.example.myapplication.timesheet.domain.usecases.TimeValidator
 import com.example.myapplication.timesheet.domain.usecases.UpdateTimeIntervalUseCase
-import com.example.myapplication.utils.formatToLongTime
+import com.example.myapplication.timetracker.domain.timetracker.TimeTracker
+import com.example.myapplication.utils.formatDateWithColon
+import com.example.myapplication.utils.formatTimeWithColon
+import com.example.myapplication.utils.formatToDateWithoutColons
+import com.example.myapplication.utils.formatToInstant
+import com.example.myapplication.utils.formatToInstantWithAdditionalDay
+import com.example.myapplication.utils.formatToTimeWithoutColons
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,7 +28,8 @@ class TimesheetViewModel @Inject constructor(
     getTimeTrackerIntervalsUseCase: GetTimeTrackerIntervalsUseCase,
     private val deleteTimeIntervalUseCase: DeleteTimeIntervalUseCase,
     private val updateTimeIntervalUseCase: UpdateTimeIntervalUseCase,
-    private val timeValidator: TimeValidator
+    private val timeValidator: TimeValidator,
+    private val timeTracker: TimeTracker,
 ) : ViewModel() {
 
     private val editIntervalDialogState: MutableStateFlow<EditIntervalDialogState?> =
@@ -53,9 +61,9 @@ class TimesheetViewModel @Inject constructor(
         editIntervalDialogState.value = EditIntervalDialogState(
             id = id,
             subject = interval.workingSubject,
-            startTime = interval.startTime!!.formatToLongTime(),
-            endTime = interval.endTime!!.formatToLongTime(),
-            date = interval.date
+            startTime = interval.startTime!!.formatToTimeWithoutColons(),
+            endTime = interval.endTime!!.formatToTimeWithoutColons(),
+            date = interval.date.formatToDateWithoutColons()
         )
     }
 
@@ -79,19 +87,71 @@ class TimesheetViewModel @Inject constructor(
         )
     }
 
+    fun onDateChanged(date: String) {
+        editIntervalDialogState.value = editIntervalDialogState.value?.copy(
+            date = date
+        )
+    }
+
     fun onDismissEditDialog(){
         editIntervalDialogState.value = null
     }
 
-    fun onSaveClicked() = viewModelScope.launch {
+    private fun onUpdateTimeSheet() = viewModelScope.launch {
         editIntervalDialogState.value?.let {
+            val editedEndTimeSmaller = isEditedEndTimeSmaller(
+                startTime = it.startTime,
+                endTime = it.endTime
+            )
             updateTimeIntervalUseCase(
+                TimeIntervalParameters(
                 id = it.id,
                 subject = it.subject,
-                startTime = it.startTime,
-                endTime = it.endTime,
+                startTime = formatToInstant(date = it.date, time = it.startTime),
+                endTime = when {
+                    editedEndTimeSmaller -> formatToInstantWithAdditionalDay(it.date, it.endTime)
+                    else -> formatToInstant(it.date, it.endTime)
+                },
                 date = it.date
+                )
             )
         }
+    }
+
+    fun onSaveClicked(){
+        saveFormattedTime()
+        onUpdateTimeSheet()
+    }
+
+    private fun saveFormattedTime(){
+        editIntervalDialogState.value = editIntervalDialogState.value?.copy(
+            startTime = editIntervalDialogState.value!!.startTime.formatTimeWithColon(),
+            endTime = editIntervalDialogState.value!!.endTime.formatTimeWithColon(),
+            date = editIntervalDialogState.value!!.date.formatDateWithColon()
+        )
+    }
+
+    private fun isEditedEndTimeSmaller(startTime: String, endTime: String): Boolean{
+        val result = startTime.compareTo(endTime)
+
+        return when {
+            result > 0 -> true
+            result < 0 -> false
+            else -> false
+        }
+    }
+
+    fun start(workingSubject: String) {
+        onWorkingSubjectChanged(workingSubject)
+        timeTracker.start()
+    }
+
+    fun reset() {
+        timeTracker.reset()
+    }
+
+
+    private fun onWorkingSubjectChanged(workingSubject: String) {
+        timeTracker.onWorkingSubjectChanged(workingSubject)
     }
 }

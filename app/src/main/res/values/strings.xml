@@ -12,4 +12,5 @@
     <string name="edit_dialog_cancel_button">Cancel</string>
     <string name="edit_dialog_start_time_text_field">Start time</string>
     <string name="edit_dialog_end_time_text_field">End time</string>
+    <string name="incorrect_time_was_entered">Incorrect time was entered</string>
 </resources>

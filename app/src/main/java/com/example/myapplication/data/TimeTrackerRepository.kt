@@ -7,6 +7,8 @@ import javax.inject.Inject
 interface TimeTrackerRepository {
 
     suspend fun insert(timeTrackerEntity: TimeTrackerEntity)
+
+    suspend fun updateTimeInterval(timeTrackerEntity: TimeTrackerEntity)
     fun getAllWorkingSubject(): Flow<List<String>>
     fun getAllTimeTrackerEntity(): Flow<List<TimeTrackerEntity>>
     fun getLastWorkingSubject(): Flow<String>
@@ -20,6 +22,10 @@ class TimeTrackerRepositoryImpl @Inject constructor(
 ) : TimeTrackerRepository {
     override suspend fun insert(timeTrackerEntity: TimeTrackerEntity) {
         timeTrackerDao.insert(timeTrackerEntity)
+    }
+
+    override suspend fun updateTimeInterval(timeTrackerEntity: TimeTrackerEntity) {
+        timeTrackerDao.updateTimeInterval(timeTrackerEntity)
     }
 
     override fun getAllWorkingSubject(): Flow<List<String>> {

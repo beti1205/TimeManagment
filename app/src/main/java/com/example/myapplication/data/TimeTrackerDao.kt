@@ -3,6 +3,7 @@ package com.example.myapplication.data
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import java.time.Instant
 
@@ -11,6 +12,9 @@ interface TimeTrackerDao {
 
     @Insert
     suspend fun insert(timeTrackerEntity: TimeTrackerEntity)
+
+    @Update
+    suspend fun updateTimeInterval(timeTrackerEntity: TimeTrackerEntity)
 
     @Query("SELECT workingSubject FROM timetrackerentity")
     fun getAllWorkingSubjects(): Flow<List<String>>

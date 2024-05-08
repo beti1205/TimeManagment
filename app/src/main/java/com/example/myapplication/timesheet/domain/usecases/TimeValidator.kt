@@ -2,7 +2,7 @@ package com.example.myapplication.timesheet.domain.usecases
 
 import javax.inject.Inject
 
-val TIME_PATTERN: Regex = Regex("""^([0-1]\d|2[0-3]):[0-5]\d:[0-5]\d$""")
+val TIME_PATTERN: Regex = Regex("""^([0-1]\d|2[0-3])[0-5]\d[0-5]\d$""")
 
 interface TimeValidator {
     operator fun invoke(timeString: String): Boolean

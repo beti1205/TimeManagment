@@ -7,9 +7,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,12 +21,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 import com.example.myapplication.timesheet.presentation.EditIntervalDialogState
+import com.example.myapplication.utils.MaskVisualTransformation
 
-@OptIn(ExperimentalMaterial3Api::class)
+object DateDefaults {
+    const val DATE_MASK = "####-##-##"
+    const val DATE_LENGTH = 8
+}
+
+
 @Composable
 fun EditDialog(
     state: EditIntervalDialogState?,
@@ -31,6 +41,10 @@ fun EditDialog(
     onStartTimeChanged: (String) -> Unit,
     onEndTimeChanged: (String) -> Unit,
     onDismissRequest: () -> Unit,
+    onStartTimePickerSelected: () -> Unit,
+    onEndTimePickerSelected: () -> Unit,
+    onDatePickerSelected: () -> Unit,
+    onDateChanged: (String) -> Unit,
     onSaveClicked: () -> Unit = {}
 ) {
     if (state != null) {
@@ -41,6 +55,35 @@ fun EditDialog(
             },
             text = {
                 Column {
+                    OutlinedTextField(
+                        modifier = Modifier,
+                        textStyle = TextStyle.Default.copy(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Light
+                        ),
+                        value = state.date,
+                        onValueChange = { if (it.length <= DateDefaults.DATE_LENGTH) onDateChanged(it) },
+                        label = {
+                            Text(
+                                text = "Start date",
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            keyboardType = KeyboardType.NumberPassword,
+                            imeAction = ImeAction.Done
+                        ),
+                        trailingIcon = {
+                            IconButton(onClick = onDatePickerSelected) {
+                                Icon(
+                                    imageVector = Icons.Outlined.DateRange,
+                                    contentDescription = null
+                                )
+                            }
+                        },
+                        visualTransformation = MaskVisualTransformation(DateDefaults.DATE_MASK),
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
                         modifier = Modifier,
                         textStyle = TextStyle.Default.copy(
@@ -60,52 +103,22 @@ fun EditDialog(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(Modifier.fillMaxWidth()) {
-                        OutlinedTextField(
+                        SetTimeTextField(
+                            time = state.startTime,
+                            isWrongTimeError = state.isWrongStartTimeError,
+                            labelText = stringResource(R.string.edit_dialog_start_time_text_field),
+                            onTimeChanged = onStartTimeChanged,
                             modifier = Modifier.weight(1f),
-                            textStyle = TextStyle.Default.copy(
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Light
-                            ),
-                            value = state.startTime,
-                            onValueChange = { onStartTimeChanged(it) },
-                            label = {
-                                Text(
-                                    text = stringResource(R.string.edit_dialog_start_time_text_field),
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                            singleLine = true,
-                            isError = state.isWrongStartTimeError,
-                            supportingText = {
-                                if (state.isWrongStartTimeError) {
-                                    Text("Please enter the correct time format, e.g. 23:59:59")
-                                }
-                            }
+                            onTimePickerClicked = onStartTimePickerSelected
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        OutlinedTextField(
+                        SetTimeTextField(
+                            time = state.endTime,
+                            isWrongTimeError = state.isWrongEndTimeError,
+                            labelText = stringResource(R.string.edit_dialog_end_time_text_field),
+                            onTimeChanged = onEndTimeChanged,
                             modifier = Modifier.weight(1f),
-                            textStyle = TextStyle.Default.copy(
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Light
-                            ),
-                            value = state.endTime,
-                            onValueChange = { onEndTimeChanged(it) },
-                            label = {
-                                Text(
-                                    text = stringResource(R.string.edit_dialog_end_time_text_field),
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
-                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                            singleLine = true,
-                            isError = state.isWrongEndTimeError,
-                            supportingText = {
-                                if (state.isWrongEndTimeError) {
-                                    Text("Please enter the correct time format, e.g. 23:59:59")
-                                }
-                            }
+                            onTimePickerClicked = onEndTimePickerSelected
                         )
                     }
                 }

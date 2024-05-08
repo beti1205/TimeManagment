@@ -32,7 +32,7 @@ fun DaySectionHeader(
 ) {
     Spacer(modifier = Modifier.height(16.dp))
     ListItem(
-        headlineText = { Text(changeDateFormat(daySection.headerDate)) },
+        headlineContent = { Text(changeDateFormat(daySection.headerDate)) },
         shadowElevation = 2.dp,
         colors = ListItemDefaults.colors(
             containerColor = Color.LightGray
