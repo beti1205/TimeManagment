@@ -3,9 +3,6 @@ package com.example.myapplication.timesheet.presentation
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -13,9 +10,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,16 +18,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.myapplication.R
 import com.example.myapplication.timesheet.domain.model.TimeTrackerInterval
 import com.example.myapplication.timesheet.domain.usecases.DaySection
+import com.example.myapplication.timesheet.presentation.components.AddEditTimeIntervalDialog
+import com.example.myapplication.timesheet.presentation.components.DatePickerDialogContent
 import com.example.myapplication.timesheet.presentation.components.DeleteDialog
-import com.example.myapplication.timesheet.presentation.components.EditDialog
 import com.example.myapplication.timesheet.presentation.components.TimeIntervalsList
 import com.example.myapplication.timesheet.presentation.components.TimePickerDialogContent
-import com.example.myapplication.utils.formatToDateWithoutColons
-import com.example.myapplication.utils.formatToLongDate
 import kotlinx.coroutines.launch
 import java.time.Instant
 
@@ -45,78 +40,59 @@ fun TimesheetScreen(
 
     TimesheetScreen(
         daySections = state.daySections,
-        editDialogState = state.editIntervalDialogState,
+        addEditDialogState = state.addEditIntervalDialogState,
         onDeleteTimeInterval = viewModel::deleteTimeInterval,
         onSaveClicked = viewModel::onSaveClicked,
         onSubjectChanged = viewModel::onSubjectChanged,
         onStartTimeChanged = viewModel::onStartTimeChanged,
         onEndTimeChanged = viewModel::onEndTimeChanged,
         onEditClicked = viewModel::onEditClicked,
-        onDismissEditDialog = viewModel::onDismissEditDialog,
+        onDismissAddEditDialog = viewModel::onDismissEditDialog,
         onTimeTrackerStarted = viewModel::start,
         onResetActionClicked = viewModel::reset,
-        onDateChanged = viewModel::onDateChanged
+        onDateChanged = viewModel::onDateChanged,
+        onAddClicked = viewModel::onAddClicked
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimesheetScreen(
     daySections: List<DaySection>,
-    editDialogState: EditIntervalDialogState?,
+    addEditDialogState: AddEditIntervalDialogState?,
     onDeleteTimeInterval: (Int) -> Unit,
     onSaveClicked: () -> Unit,
     onSubjectChanged: (String) -> Unit,
     onStartTimeChanged: (String) -> Unit,
     onEndTimeChanged: (String) -> Unit,
     onEditClicked: (Int) -> Unit,
-    onDismissEditDialog: () -> Unit,
+    onDismissAddEditDialog: () -> Unit,
     onTimeTrackerStarted: (String) -> Unit,
     onResetActionClicked: () -> Unit,
     onDateChanged: (String) -> Unit,
+    onAddClicked: () -> Unit
 ) {
     var idToBeDeleted: Int? by remember { mutableStateOf(null) }
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    var time: String? by remember { mutableStateOf(null) }
+    var isStartTimePickerSelected: Boolean? by remember { mutableStateOf(null) }
     var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
 
-    if (time != null) {
+
+    isStartTimePickerSelected?.let {
         TimePickerDialogContent(
-            editDialogState = editDialogState,
-            isStartTimePickerSelected = time == editDialogState?.startTime,
+            addEditDialogState = addEditDialogState,
+            isStartTimePickerSelected = it,
             onStartTimeChanged = onStartTimeChanged,
             onEndTimeChanged = onEndTimeChanged,
-            onDismiss = { time = null }
+            onDismiss = { isStartTimePickerSelected = null }
         )
     }
 
     if (showDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        datePickerState.selectedDateMillis?.let {
-                            onDateChanged(
-                                it.formatToDateWithoutColons()
-                            )
-                        }
-                        showDatePicker = false
-                    }
-                ) { Text("OK") }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        showDatePicker = false
-                    }
-                ) { Text("Cancel") }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
+        DatePickerDialogContent(
+            onDismissDatePickerDialog = { showDatePicker = false },
+            onDateChanged = onDateChanged
+        )
     }
 
 
@@ -125,7 +101,7 @@ fun TimesheetScreen(
             SnackbarHost(hostState = snackbarHostState)
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {}) {
+            FloatingActionButton(onClick = onAddClicked) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
 
@@ -157,16 +133,20 @@ fun TimesheetScreen(
             modifier = Modifier.padding(contentPadding)
         )
 
-        editDialogState?.let { state ->
-            EditDialog(
-                state = state,
-                onDismissRequest = onDismissEditDialog,
+        addEditDialogState?.let { state ->
+            AddEditTimeIntervalDialog(
+                state = addEditDialogState,
+                headerText = when {
+                    state.id != null -> stringResource(id = R.string.edit_menu_item_label)
+                    else -> "Add time entity"
+                },
+                onDismissRequest = onDismissAddEditDialog,
                 onSaveClicked = onSaveClicked,
                 onStartTimeChanged = onStartTimeChanged,
                 onEndTimeChanged = onEndTimeChanged,
                 onSubjectChanged = onSubjectChanged,
-                onStartTimePickerSelected = { time = editDialogState.startTime },
-                onEndTimePickerSelected = { time = editDialogState.endTime },
+                onStartTimePickerSelected = { isStartTimePickerSelected = true },
+                onEndTimePickerSelected = { isStartTimePickerSelected = false },
                 onDatePickerSelected = { showDatePicker = true },
                 onDateChanged = onDateChanged
             )
@@ -180,6 +160,7 @@ fun TimesheetScreen(
         }
     }
 }
+
 
 @Preview
 @Composable
@@ -202,7 +183,7 @@ fun TimeSheetScreenPreview() {
                 )
             )
         ),
-        editDialogState = EditIntervalDialogState(
+        addEditDialogState = AddEditIntervalDialogState(
             id = 1,
             subject = "Upgrade SDK",
             startTime = "01:59:06",
@@ -215,9 +196,10 @@ fun TimeSheetScreenPreview() {
         onStartTimeChanged = {},
         onEndTimeChanged = {},
         onEditClicked = {},
-        onDismissEditDialog = {},
+        onDismissAddEditDialog = {},
         onTimeTrackerStarted = {},
         onResetActionClicked = {},
-        onDateChanged = {}
+        onDateChanged = {},
+        onAddClicked = {}
     )
 }

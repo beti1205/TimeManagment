@@ -23,7 +23,6 @@ import com.example.myapplication.timesheet.domain.usecases.DaySection
 import com.example.myapplication.utils.changeDateFormat
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 fun DaySectionHeader(
     daySection: DaySection,
     index: Int,

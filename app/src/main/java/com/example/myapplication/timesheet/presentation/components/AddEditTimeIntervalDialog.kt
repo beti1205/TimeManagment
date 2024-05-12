@@ -25,7 +25,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
-import com.example.myapplication.timesheet.presentation.EditIntervalDialogState
+import com.example.myapplication.timesheet.presentation.AddEditIntervalDialogState
 import com.example.myapplication.utils.MaskVisualTransformation
 
 object DateDefaults {
@@ -35,8 +35,9 @@ object DateDefaults {
 
 
 @Composable
-fun EditDialog(
-    state: EditIntervalDialogState?,
+fun AddEditTimeIntervalDialog(
+    state: AddEditIntervalDialogState?,
+    headerText: String,
     onSubjectChanged: (String) -> Unit,
     onStartTimeChanged: (String) -> Unit,
     onEndTimeChanged: (String) -> Unit,
@@ -51,12 +52,11 @@ fun EditDialog(
         AlertDialog(
             onDismissRequest = onDismissRequest,
             title = {
-                Text(text = stringResource(id = R.string.edit_menu_item_label))
+                Text(text = headerText)
             },
             text = {
                 Column {
                     OutlinedTextField(
-                        modifier = Modifier,
                         textStyle = TextStyle.Default.copy(
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Light
@@ -73,6 +73,12 @@ fun EditDialog(
                             keyboardType = KeyboardType.NumberPassword,
                             imeAction = ImeAction.Done
                         ),
+                        isError = state.isWrongDateError,
+                        supportingText = {
+                            if (state.isWrongDateError) {
+                                Text("Incorrect date was entered")
+                            }
+                        },
                         trailingIcon = {
                             IconButton(onClick = onDatePickerSelected) {
                                 Icon(
@@ -85,7 +91,6 @@ fun EditDialog(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
-                        modifier = Modifier,
                         textStyle = TextStyle.Default.copy(
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Light
@@ -101,7 +106,7 @@ fun EditDialog(
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                         maxLines = 3
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     Row(Modifier.fillMaxWidth()) {
                         SetTimeTextField(
                             time = state.startTime,

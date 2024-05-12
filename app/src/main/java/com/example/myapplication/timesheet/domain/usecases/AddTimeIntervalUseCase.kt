@@ -2,20 +2,21 @@ package com.example.myapplication.timesheet.domain.usecases
 
 import com.example.myapplication.data.TimeTrackerEntity
 import com.example.myapplication.data.TimeTrackerRepository
+import java.time.Instant
 import javax.inject.Inject
 
-interface UpdateTimeIntervalUseCase {
+interface AddTimeIntervalUseCase {
     suspend operator fun invoke(
         timeIntervalParameters: TimeIntervalParameters
     )
 }
 
-class UpdateTimeIntervalUseCaseImpl @Inject constructor(
+class AddTimeIntervalUseCaseImpl @Inject constructor(
     private val repository: TimeTrackerRepository
-) : UpdateTimeIntervalUseCase {
+) : AddTimeIntervalUseCase {
     override suspend fun invoke(
      timeIntervalParameters: TimeIntervalParameters
     ) {
-        return repository.updateTimeInterval(timeIntervalParameters.asTimeTrackerEntity())
+        return repository.insert(timeIntervalParameters.asTimeTrackerEntity())
     }
 }

@@ -1,6 +1,10 @@
 package com.example.myapplication.di
 
 import com.example.myapplication.data.TimeTrackerRepository
+import com.example.myapplication.timesheet.domain.usecases.AddTimeIntervalUseCase
+import com.example.myapplication.timesheet.domain.usecases.AddTimeIntervalUseCaseImpl
+import com.example.myapplication.timesheet.domain.usecases.DateValidator
+import com.example.myapplication.timesheet.domain.usecases.DateValidatorImpl
 import com.example.myapplication.timesheet.domain.usecases.DeleteTimeIntervalUseCase
 import com.example.myapplication.timesheet.domain.usecases.DeleteTimeIntervalUseCaseImpl
 import com.example.myapplication.timesheet.domain.usecases.GetTimeTrackerIntervalsUseCase
@@ -40,7 +44,17 @@ object DomainModule {
     }
 
     @Provides
+    fun addTimeIntervalUseCase(repository: TimeTrackerRepository): AddTimeIntervalUseCase {
+        return AddTimeIntervalUseCaseImpl(repository)
+    }
+
+    @Provides
     fun timeValidator(): TimeValidator {
         return TimeValidatorImpl()
+    }
+
+    @Provides
+    fun dateValidator(): DateValidator {
+        return DateValidatorImpl()
     }
 }

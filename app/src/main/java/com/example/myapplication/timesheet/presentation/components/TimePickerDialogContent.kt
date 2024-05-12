@@ -1,32 +1,40 @@
 package com.example.myapplication.timesheet.presentation.components
 
+import android.annotation.SuppressLint
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
-import com.example.myapplication.timesheet.presentation.EditIntervalDialogState
+import com.example.myapplication.timesheet.presentation.AddEditIntervalDialogState
 import com.example.myapplication.utils.TimePickerDialog
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun TimePickerDialogContent(
-    editDialogState: EditIntervalDialogState?,
+    addEditDialogState: AddEditIntervalDialogState?,
     isStartTimePickerSelected: Boolean,
     onStartTimeChanged: (String) -> Unit,
     onEndTimeChanged: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val startTime = addEditDialogState?.startTime
+    val initialStartTime = getInitialTime(startTime)
     val startTimePickerState = rememberTimePickerState(
-        initialHour = editDialogState?.startTime?.substring(0, 2)?.toInt() ?: 12,
-        initialMinute = editDialogState?.startTime?.substring(2, 4)?.toInt() ?: 0
+        initialHour = initialStartTime.hour,
+        initialMinute = initialStartTime.minute
     )
 
+    val endTime = addEditDialogState?.endTime
+    val initialEndTime = getInitialTime(endTime)
     val endTimePickerState = rememberTimePickerState(
-        initialHour = editDialogState?.endTime?.substring(0, 2)?.toInt() ?: 12,
-        initialMinute = editDialogState?.endTime?.substring(2, 4)?.toInt() ?: 0
+        initialHour = initialEndTime.hour,
+        initialMinute = initialEndTime.hour,
     )
+
+    val startTimeSeconds = getFinalSeconds(startTime)
+    val endTimeSeconds = getFinalSeconds(endTime)
 
     TimePickerDialog(
         onDismissRequest = onDismiss,
@@ -35,21 +43,19 @@ fun TimePickerDialogContent(
                 onClick = {
                     when {
                         isStartTimePickerSelected -> onStartTimeChanged(
-                            "${startTimePickerState.hour}${startTimePickerState.minute}${
-                                editDialogState!!.startTime.substring(
-                                    4,
-                                    6
+                            "${getFormattedFinalTime(startTimePickerState.hour)}${
+                                getFormattedFinalTime(
+                                    startTimePickerState.minute
                                 )
-                            }"
+                            }${startTimeSeconds}"
                         )
 
                         else -> onEndTimeChanged(
-                            "${endTimePickerState.hour}${endTimePickerState.minute}${
-                                editDialogState!!.endTime.substring(
-                                    4,
-                                    6
+                            "${getFormattedFinalTime(endTimePickerState.hour)}${
+                                getFormattedFinalTime(
+                                    endTimePickerState.minute
                                 )
-                            }"
+                            }${endTimeSeconds}"
                         )
                     }
                     onDismiss()
@@ -69,5 +75,14 @@ fun TimePickerDialogContent(
                 endTimePickerState
             }
         )
+    }
+}
+
+@SuppressLint("DefaultLocale")
+fun getFormattedFinalTime(time: Int): String {
+    return if (time < 10) {
+        String.format("%02d", time)
+    } else {
+        time.toString()
     }
 }
