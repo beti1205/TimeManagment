@@ -9,8 +9,8 @@ import com.example.myapplication.timesheet.domain.usecases.DeleteTimeIntervalUse
 import com.example.myapplication.timesheet.domain.usecases.DeleteTimeIntervalUseCaseImpl
 import com.example.myapplication.timesheet.domain.usecases.GetTimeTrackerIntervalsUseCase
 import com.example.myapplication.timesheet.domain.usecases.GetTimeTrackerIntervalsUseCaseImpl
-import com.example.myapplication.timesheet.domain.usecases.TimeValidator
-import com.example.myapplication.timesheet.domain.usecases.TimeValidatorImpl
+import com.example.myapplication.timesheet.domain.usecases.ValidateTime
+import com.example.myapplication.timesheet.domain.usecases.ValidateTimeImpl
 import com.example.myapplication.timesheet.domain.usecases.UpdateTimeIntervalUseCase
 import com.example.myapplication.timesheet.domain.usecases.UpdateTimeIntervalUseCaseImpl
 import com.example.myapplication.timetracker.domain.usecases.GetAllWorkingSubjectsUseCase
@@ -49,8 +49,8 @@ object DomainModule {
     }
 
     @Provides
-    fun timeValidator(): TimeValidator {
-        return TimeValidatorImpl()
+    fun timeValidator(): ValidateTime {
+        return ValidateTimeImpl()
     }
 
     @Provides

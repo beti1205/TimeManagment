@@ -10,8 +10,8 @@ data class TimesheetScreenState(
 data class AddEditIntervalDialogState(
     val id: Int? = null,
     val subject: String,
-    val startTime: String,
-    val endTime: String,
+    val startTime: Time?,
+    val endTime: Time?,
     val date: String,
     val isWrongStartTimeError: Boolean = false,
     val isWrongEndTimeError: Boolean = false,
@@ -19,5 +19,11 @@ data class AddEditIntervalDialogState(
 ) {
     val isSaveEnabled: Boolean
         get() = !isWrongStartTimeError && !isWrongEndTimeError && !isWrongDateError && subject.isNotEmpty()
-                && date.isNotEmpty() && startTime.isNotEmpty() && endTime.isNotEmpty()
+                && date.isNotEmpty() && startTime != null && endTime != null
 }
+
+data class Time(
+    val hours: String,
+    val minutes: String,
+    val seconds: String
+)

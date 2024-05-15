@@ -7,7 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import com.example.myapplication.utils.formatToDateWithoutColons
+import com.example.myapplication.utils.formatToDateWithoutDash
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,7 +24,7 @@ fun DatePickerDialogContent(
                 onClick = {
                     datePickerState.selectedDateMillis?.let {
                         onDateChanged(
-                            it.formatToDateWithoutColons()
+                            it.formatToDateWithoutDash()
                         )
                     }
                     onDismissDatePickerDialog()

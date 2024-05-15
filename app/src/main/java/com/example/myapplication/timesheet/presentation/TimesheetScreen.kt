@@ -186,8 +186,8 @@ fun TimeSheetScreenPreview() {
         addEditDialogState = AddEditIntervalDialogState(
             id = 1,
             subject = "Upgrade SDK",
-            startTime = "01:59:06",
-            endTime = "02:59:06",
+            startTime = null,
+            endTime = null,
             date = "Thu, Nov30"
         ),
         onDeleteTimeInterval = {},

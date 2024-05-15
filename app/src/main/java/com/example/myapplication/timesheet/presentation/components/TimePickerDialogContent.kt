@@ -20,21 +20,16 @@ fun TimePickerDialogContent(
     onDismiss: () -> Unit
 ) {
     val startTime = addEditDialogState?.startTime
-    val initialStartTime = getInitialTime(startTime)
     val startTimePickerState = rememberTimePickerState(
-        initialHour = initialStartTime.hour,
-        initialMinute = initialStartTime.minute
+        initialHour = startTime?.hours?.toInt() ?: 12,
+        initialMinute = startTime?.minutes?.toInt() ?: 0
     )
 
     val endTime = addEditDialogState?.endTime
-    val initialEndTime = getInitialTime(endTime)
     val endTimePickerState = rememberTimePickerState(
-        initialHour = initialEndTime.hour,
-        initialMinute = initialEndTime.hour,
+        initialHour = endTime?.hours?.toInt() ?: 12,
+        initialMinute = endTime?.minutes?.toInt() ?: 0
     )
-
-    val startTimeSeconds = getFinalSeconds(startTime)
-    val endTimeSeconds = getFinalSeconds(endTime)
 
     TimePickerDialog(
         onDismissRequest = onDismiss,
@@ -47,7 +42,7 @@ fun TimePickerDialogContent(
                                 getFormattedFinalTime(
                                     startTimePickerState.minute
                                 )
-                            }${startTimeSeconds}"
+                            }${addEditDialogState?.startTime?.seconds ?: "00"}"
                         )
 
                         else -> onEndTimeChanged(
@@ -55,7 +50,7 @@ fun TimePickerDialogContent(
                                 getFormattedFinalTime(
                                     endTimePickerState.minute
                                 )
-                            }${endTimeSeconds}"
+                            }${addEditDialogState?.endTime?.seconds ?: "00"}"
                         )
                     }
                     onDismiss()
@@ -80,9 +75,5 @@ fun TimePickerDialogContent(
 
 @SuppressLint("DefaultLocale")
 fun getFormattedFinalTime(time: Int): String {
-    return if (time < 10) {
-        String.format("%02d", time)
-    } else {
-        time.toString()
-    }
+    return String.format("%02d", time)
 }
