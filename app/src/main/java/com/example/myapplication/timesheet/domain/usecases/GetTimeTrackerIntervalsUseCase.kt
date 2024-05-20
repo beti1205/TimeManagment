@@ -3,6 +3,7 @@ package com.example.myapplication.timesheet.domain.usecases
 import com.example.myapplication.data.TimeTrackerRepository
 import com.example.myapplication.timesheet.domain.model.TimeTrackerInterval
 import com.example.myapplication.timesheet.domain.model.toTimeTrackerInterval
+import com.example.myapplication.timesheet.presentation.DaySection
 import com.example.myapplication.timetracker.domain.stopwatch.formatTime
 import com.example.myapplication.timetracker.domain.stopwatch.toTime
 import kotlinx.coroutines.flow.Flow
@@ -31,9 +32,3 @@ class GetTimeTrackerIntervalsUseCaseImpl @Inject constructor(
         }
     }
 }
-
-data class DaySection(
-    val headerDate: String,
-    val headerTimeAmount: String,
-    val timeIntervals: List<TimeTrackerInterval>
-)

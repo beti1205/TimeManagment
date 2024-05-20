@@ -19,7 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.timesheet.domain.usecases.DaySection
+import com.example.myapplication.timesheet.presentation.DaySection
 import com.example.myapplication.utils.changeDateFormat
 
 @Composable

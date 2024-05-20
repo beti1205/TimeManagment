@@ -1,10 +1,12 @@
 package com.example.myapplication.timesheet.presentation
 
-import com.example.myapplication.timesheet.domain.usecases.DaySection
+import com.example.myapplication.timesheet.domain.model.TimeTrackerInterval
 
 data class TimesheetScreenState(
     val daySections: List<DaySection> = emptyList(),
-    val addEditIntervalDialogState: AddEditIntervalDialogState? = null
+    val addEditIntervalDialogState: AddEditIntervalDialogState? = null,
+    val searchBarState: SearchBarState = SearchBarState(),
+    val subjects: List<String> = emptyList()
 )
 
 data class AddEditIntervalDialogState(
@@ -26,4 +28,15 @@ data class Time(
     val hours: String,
     val minutes: String,
     val seconds: String
+)
+
+data class DaySection(
+    val headerDate: String,
+    val headerTimeAmount: String,
+    val timeIntervals: List<TimeTrackerInterval>
+)
+
+data class SearchBarState(
+    val isSearching: Boolean = false,
+    val searchText: String = ""
 )

@@ -9,6 +9,8 @@ import com.example.myapplication.timesheet.domain.usecases.GetTimeTrackerInterva
 import com.example.myapplication.timesheet.domain.usecases.TimeIntervalParameters
 import com.example.myapplication.timesheet.domain.usecases.ValidateTime
 import com.example.myapplication.timesheet.domain.usecases.UpdateTimeIntervalUseCase
+import com.example.myapplication.timetracker.domain.stopwatch.formatTime
+import com.example.myapplication.timetracker.domain.stopwatch.toTime
 import com.example.myapplication.timetracker.domain.timetracker.TimeTracker
 import com.example.myapplication.utils.formatDateWithDash
 import com.example.myapplication.utils.formatToDateWithoutDash
@@ -39,13 +41,53 @@ class TimesheetViewModel @Inject constructor(
     private val addEditIntervalDialogState: MutableStateFlow<AddEditIntervalDialogState?> =
         MutableStateFlow(null)
 
+    private val searchBarState: MutableStateFlow<SearchBarState> =
+        MutableStateFlow(SearchBarState())
+
     val state: StateFlow<TimesheetScreenState> = combine(
         getTimeTrackerIntervalsUseCase(),
-        addEditIntervalDialogState
-    ) { daySections, editIntervalDialogState ->
+        addEditIntervalDialogState,
+        searchBarState
+    ) { daySections, editIntervalDialogState, searchBar ->
+
+        val searchText = searchBar.searchText
+        val subjects = daySections
+            .flatMap { daySection ->
+                daySection.timeIntervals.map { it.workingSubject }
+            }
+            .distinct()
+            .filter { subject ->
+                searchText.isBlank() || subject.contains(
+                    searchText.trim(),
+                    true
+                )
+            }
+
+        val filteredDaySections = if (searchText.isNotEmpty() && !searchBar.isSearching) {
+            daySections.mapNotNull { section ->
+                val matchingIntervals = section.timeIntervals.filter { interval ->
+                    interval.workingSubject == searchText
+                }
+
+                if (matchingIntervals.isNotEmpty()) {
+                    DaySection(
+                        headerDate = section.headerDate,
+                        headerTimeAmount = matchingIntervals.sumOf { it.timeElapsed }.toTime().formatTime(),
+                        timeIntervals = matchingIntervals
+                    )
+                } else {
+                    null
+                }
+            }
+        } else {
+            daySections
+        }
+
         TimesheetScreenState(
-            daySections = daySections,
-            addEditIntervalDialogState = editIntervalDialogState
+            daySections = filteredDaySections,
+            addEditIntervalDialogState = editIntervalDialogState,
+            searchBarState = searchBar,
+            subjects = subjects
         )
     }.stateIn(
         scope = viewModelScope,
@@ -226,5 +268,29 @@ class TimesheetViewModel @Inject constructor(
 
     private fun onWorkingSubjectChanged(workingSubject: String) {
         timeTracker.onWorkingSubjectChanged(workingSubject)
+    }
+
+    fun onSearchTextChange(text: String) {
+        searchBarState.value = searchBarState.value.copy(
+            searchText = text
+        )
+    }
+
+    fun onToogleSearch() {
+        onIsSearchingChanged()
+        if (!searchBarState.value.isSearching) {
+            onSearchTextChange("")
+        }
+    }
+
+    private fun onIsSearchingChanged() {
+        searchBarState.value = searchBarState.value.copy(
+            isSearching = !searchBarState.value.isSearching
+        )
+    }
+
+    fun onSubjectSelected(subject: String) {
+        onIsSearchingChanged()
+        onSearchTextChange(subject)
     }
 }

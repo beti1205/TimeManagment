@@ -1,5 +1,6 @@
 package com.example.myapplication.timesheet.presentation
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -23,10 +24,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
 import com.example.myapplication.timesheet.domain.model.TimeTrackerInterval
-import com.example.myapplication.timesheet.domain.usecases.DaySection
 import com.example.myapplication.timesheet.presentation.components.AddEditTimeIntervalDialog
 import com.example.myapplication.timesheet.presentation.components.DatePickerDialogContent
 import com.example.myapplication.timesheet.presentation.components.DeleteDialog
+import com.example.myapplication.timesheet.presentation.components.SearchBar
 import com.example.myapplication.timesheet.presentation.components.TimeIntervalsList
 import com.example.myapplication.timesheet.presentation.components.TimePickerDialogContent
 import kotlinx.coroutines.launch
@@ -39,8 +40,7 @@ fun TimesheetScreen(
     val state by viewModel.state.collectAsState()
 
     TimesheetScreen(
-        daySections = state.daySections,
-        addEditDialogState = state.addEditIntervalDialogState,
+        state = state,
         onDeleteTimeInterval = viewModel::deleteTimeInterval,
         onSaveClicked = viewModel::onSaveClicked,
         onSubjectChanged = viewModel::onSubjectChanged,
@@ -51,14 +51,16 @@ fun TimesheetScreen(
         onTimeTrackerStarted = viewModel::start,
         onResetActionClicked = viewModel::reset,
         onDateChanged = viewModel::onDateChanged,
-        onAddClicked = viewModel::onAddClicked
+        onAddClicked = viewModel::onAddClicked,
+        onSearchTextChange = viewModel::onSearchTextChange,
+        onToogleSearch = viewModel::onToogleSearch,
+        onSubjectSelected = viewModel::onSubjectSelected
     )
 }
 
 @Composable
 fun TimesheetScreen(
-    daySections: List<DaySection>,
-    addEditDialogState: AddEditIntervalDialogState?,
+    state: TimesheetScreenState,
     onDeleteTimeInterval: (Int) -> Unit,
     onSaveClicked: () -> Unit,
     onSubjectChanged: (String) -> Unit,
@@ -69,7 +71,10 @@ fun TimesheetScreen(
     onTimeTrackerStarted: (String) -> Unit,
     onResetActionClicked: () -> Unit,
     onDateChanged: (String) -> Unit,
-    onAddClicked: () -> Unit
+    onAddClicked: () -> Unit,
+    onSearchTextChange: (String) -> Unit,
+    onToogleSearch: () -> Unit,
+    onSubjectSelected: (String) -> Unit
 ) {
     var idToBeDeleted: Int? by remember { mutableStateOf(null) }
     val scope = rememberCoroutineScope()
@@ -80,7 +85,7 @@ fun TimesheetScreen(
 
     isStartTimePickerSelected?.let {
         TimePickerDialogContent(
-            addEditDialogState = addEditDialogState,
+            addEditDialogState = state.addEditIntervalDialogState,
             isStartTimePickerSelected = it,
             onStartTimeChanged = onStartTimeChanged,
             onEndTimeChanged = onEndTimeChanged,
@@ -95,8 +100,44 @@ fun TimesheetScreen(
         )
     }
 
+    state.addEditIntervalDialogState?.let { state ->
+        AddEditTimeIntervalDialog(
+            state = state,
+            headerText = when {
+                state.id != null -> stringResource(id = R.string.edit_menu_item_label)
+                else -> "Add time entity"
+            },
+            onDismissRequest = onDismissAddEditDialog,
+            onSaveClicked = onSaveClicked,
+            onStartTimeChanged = onStartTimeChanged,
+            onEndTimeChanged = onEndTimeChanged,
+            onSubjectChanged = onSubjectChanged,
+            onStartTimePickerSelected = { isStartTimePickerSelected = true },
+            onEndTimePickerSelected = { isStartTimePickerSelected = false },
+            onDatePickerSelected = { showDatePicker = true },
+            onDateChanged = onDateChanged
+        )
+    }
+
+    idToBeDeleted?.let { id ->
+        DeleteDialog(
+            onDismissRequest = { idToBeDeleted = null },
+            onDeleteConfirm = { onDeleteTimeInterval(id) }
+        )
+    }
+
 
     Scaffold(
+        topBar = {
+            SearchBar(
+                isSearching = state.searchBarState.isSearching,
+                searchText = state.searchBarState.searchText,
+                subjects = state.subjects,
+                onSearchTextChange = onSearchTextChange,
+                onToogleSearch = onToogleSearch,
+                onSubjectSelected = onSubjectSelected
+            )
+        },
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
         },
@@ -107,88 +148,65 @@ fun TimesheetScreen(
 
         }
     ) { contentPadding ->
-        TimeIntervalsList(
-            daySections = daySections,
-            onDeleteClicked = { idToBeDeleted = it },
-            onEditClicked = onEditClicked,
-            onTimeTrackerStarted = { subject ->
-                onTimeTrackerStarted(subject)
-                scope.launch {
-                    val result = snackbarHostState.showSnackbar(
-                        message = "Time tracker started",
-                        actionLabel = "Reset",
-                        duration = SnackbarDuration.Short
-                    )
-                    when (result) {
-                        SnackbarResult.ActionPerformed -> {
-                            onResetActionClicked()
+        Column(modifier = Modifier.padding(contentPadding)) {
+            TimeIntervalsList(
+                daySections = state.daySections,
+                onDeleteClicked = { idToBeDeleted = it },
+                onEditClicked = onEditClicked,
+                onTimeTrackerStarted = { subject ->
+                    onTimeTrackerStarted(subject)
+                    scope.launch {
+                        val result = snackbarHostState.showSnackbar(
+                            message = "Time tracker started",
+                            actionLabel = "Reset",
+                            duration = SnackbarDuration.Short
+                        )
+                        when (result) {
+                            SnackbarResult.ActionPerformed -> {
+                                onResetActionClicked()
+                            }
+
+                            SnackbarResult.Dismissed -> Unit
                         }
 
-                        SnackbarResult.Dismissed -> Unit
                     }
-
-                }
-
-            },
-            modifier = Modifier.padding(contentPadding)
-        )
-
-        addEditDialogState?.let { state ->
-            AddEditTimeIntervalDialog(
-                state = addEditDialogState,
-                headerText = when {
-                    state.id != null -> stringResource(id = R.string.edit_menu_item_label)
-                    else -> "Add time entity"
                 },
-                onDismissRequest = onDismissAddEditDialog,
-                onSaveClicked = onSaveClicked,
-                onStartTimeChanged = onStartTimeChanged,
-                onEndTimeChanged = onEndTimeChanged,
-                onSubjectChanged = onSubjectChanged,
-                onStartTimePickerSelected = { isStartTimePickerSelected = true },
-                onEndTimePickerSelected = { isStartTimePickerSelected = false },
-                onDatePickerSelected = { showDatePicker = true },
-                onDateChanged = onDateChanged
-            )
-        }
-
-        idToBeDeleted?.let { id ->
-            DeleteDialog(
-                onDismissRequest = { idToBeDeleted = null },
-                onDeleteConfirm = { onDeleteTimeInterval(id) }
             )
         }
     }
 }
 
-
 @Preview
 @Composable
 fun TimeSheetScreenPreview() {
     TimesheetScreen(
-        daySections = listOf(
-            DaySection(
-                headerDate = "Thu, Nov30",
-                headerTimeAmount = "01:59:06",
-                timeIntervals = listOf(
-                    TimeTrackerInterval(
-                        id = 1,
-                        timeElapsed = 7,
-                        workingSubject = "Upgrade SDK",
-                        date = "Thu, Nov30",
-                        startTime = Instant.now(),
-                        endTime = Instant.now(),
-                        additionalDays = "0"
+        state = TimesheetScreenState(
+            daySections = listOf(
+                DaySection(
+                    headerDate = "Thu, Nov30",
+                    headerTimeAmount = "01:59:06",
+                    timeIntervals = listOf(
+                        TimeTrackerInterval(
+                            id = 1,
+                            timeElapsed = 7,
+                            workingSubject = "Upgrade SDK",
+                            date = "Thu, Nov30",
+                            startTime = Instant.now(),
+                            endTime = Instant.now(),
+                            additionalDays = "0"
+                        )
                     )
                 )
-            )
-        ),
-        addEditDialogState = AddEditIntervalDialogState(
-            id = 1,
-            subject = "Upgrade SDK",
-            startTime = null,
-            endTime = null,
-            date = "Thu, Nov30"
+            ),
+            addEditIntervalDialogState = AddEditIntervalDialogState(
+                id = 1,
+                subject = "Upgrade SDK",
+                startTime = null,
+                endTime = null,
+                date = "Thu, Nov30"
+            ),
+            searchBarState = SearchBarState(),
+            subjects = emptyList()
         ),
         onDeleteTimeInterval = {},
         onSaveClicked = {},
@@ -200,6 +218,9 @@ fun TimeSheetScreenPreview() {
         onTimeTrackerStarted = {},
         onResetActionClicked = {},
         onDateChanged = {},
-        onAddClicked = {}
+        onAddClicked = {},
+        onToogleSearch = {},
+        onSearchTextChange = {},
+        onSubjectSelected = {}
     )
 }

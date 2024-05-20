@@ -8,7 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.timesheet.domain.usecases.DaySection
+import com.example.myapplication.timesheet.presentation.DaySection
 
 @Composable
 fun TimeIntervalsList(
@@ -20,7 +20,10 @@ fun TimeIntervalsList(
 ) {
     val collapsedState = remember(daySections) { daySections.map { false }.toMutableStateList() }
 
-    LazyColumn(contentPadding = PaddingValues(16.dp), modifier = modifier) {
+    LazyColumn(
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+        modifier = modifier
+    ) {
         daySections.forEachIndexed { i, daySection ->
             val collapsed = collapsedState[i]
 
