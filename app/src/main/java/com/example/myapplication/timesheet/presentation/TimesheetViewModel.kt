@@ -65,19 +65,7 @@ class TimesheetViewModel @Inject constructor(
 
         val filteredDaySections = if (searchText.isNotEmpty() && !searchBar.isSearching) {
             daySections.mapNotNull { section ->
-                val matchingIntervals = section.timeIntervals.filter { interval ->
-                    interval.workingSubject == searchText
-                }
-
-                if (matchingIntervals.isNotEmpty()) {
-                    DaySection(
-                        headerDate = section.headerDate,
-                        headerTimeAmount = matchingIntervals.sumOf { it.timeElapsed }.toTime().formatTime(),
-                        timeIntervals = matchingIntervals
-                    )
-                } else {
-                    null
-                }
+                getFilteredDaySection(section, searchText)
             }
         } else {
             daySections
@@ -94,6 +82,26 @@ class TimesheetViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(500L),
         initialValue = TimesheetScreenState()
     )
+
+    private fun getFilteredDaySection(
+        section: DaySection,
+        searchText: String
+    ): DaySection? {
+        val matchingIntervals = section.timeIntervals.filter { interval ->
+            interval.workingSubject == searchText
+        }
+
+        return if (matchingIntervals.isNotEmpty()) {
+            DaySection(
+                headerDate = section.headerDate,
+                headerTimeAmount = matchingIntervals.sumOf { it.timeElapsed }.toTime()
+                    .formatTime(),
+                timeIntervals = matchingIntervals
+            )
+        } else {
+            null
+        }
+    }
 
     fun deleteTimeInterval(id: Int) = viewModelScope.launch {
         deleteTimeIntervalUseCase(id)
@@ -257,17 +265,11 @@ class TimesheetViewModel @Inject constructor(
     }
 
     fun start(workingSubject: String) {
-        onWorkingSubjectChanged(workingSubject)
-        timeTracker.start()
+        timeTracker.startOrResetTimer(workingSubject)
     }
 
     fun reset() {
         timeTracker.reset()
-    }
-
-
-    private fun onWorkingSubjectChanged(workingSubject: String) {
-        timeTracker.onWorkingSubjectChanged(workingSubject)
     }
 
     fun onSearchTextChange(text: String) {
@@ -276,7 +278,7 @@ class TimesheetViewModel @Inject constructor(
         )
     }
 
-    fun onToogleSearch() {
+    fun onToggleSearch() {
         onIsSearchingChanged()
         if (!searchBarState.value.isSearching) {
             onSearchTextChange("")

@@ -41,7 +41,6 @@ class TimeTrackerViewModel @Inject constructor(
             startTime = timeTrackerState.startTime,
             endTime = timeTrackerState.endTime,
             workingSubject = timeTrackerState.workingSubject,
-            isTimeTrackingFinished = timeTrackerState.isTimeTrackingFinished,
             isSubjectErrorOccurred = isSubjectError,
             filteredSubjectList = filteredSubjects
         )
@@ -52,7 +51,7 @@ class TimeTrackerViewModel @Inject constructor(
         timeTracker.start()
     }
 
-    fun restart() {
+    fun reset() {
         timeTracker.reset()
     }
 

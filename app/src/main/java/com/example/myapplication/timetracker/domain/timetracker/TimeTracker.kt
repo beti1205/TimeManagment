@@ -4,12 +4,11 @@ import com.example.myapplication.data.TimeTrackerEntity
 import com.example.myapplication.data.TimeTrackerRepository
 import com.example.myapplication.timetracker.domain.stopwatch.StopWatch
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -22,7 +21,6 @@ data class TimeTrackerState(
     val startTime: Instant? = null,
     val endTime: Instant? = null,
     val workingSubject: String = "",
-    val isTimeTrackingFinished: Boolean = false,
     val date: String = ""
 )
 
@@ -30,12 +28,12 @@ data class TimeTrackerState(
 class TimeTracker @Inject constructor(
     private val stopWatch: StopWatch,
     private val repository: TimeTrackerRepository,
-    scope: CoroutineScope
+    private val scope: CoroutineScope
 ) {
 
     private val workingSubject: MutableStateFlow<String> = MutableStateFlow("")
 
-    val state: Flow<TimeTrackerState> = stopWatch.state
+    val state: StateFlow<TimeTrackerState> = stopWatch.state
         .combine(workingSubject) { stopWatchState, subject ->
             stopWatchState.run {
                 TimeTrackerState(
@@ -43,35 +41,34 @@ class TimeTracker @Inject constructor(
                     timeElapsed = timeElapsed,
                     startTime = startTime,
                     endTime = endTime,
-                    isTimeTrackingFinished = isTimeTrackingFinished,
                     workingSubject = subject,
                     date = date
                 )
             }
-        }
+        }.stateIn(
+            scope = scope,
+            started = SharingStarted.Eagerly,
+            initialValue = TimeTrackerState()
+        )
 
-    init {
-        scope.launch {
-            stopWatch.state
-                .map { it.isTimeTrackingFinished }
-                .distinctUntilChanged()
-                .collectLatest { isTimeTrackingFinished ->
-                    if (isTimeTrackingFinished) {
-                        val state = stopWatch.state.value
-                        repository.insert(
-                            TimeTrackerEntity(
-                                startTime = state.startTime,
-                                endTime = state.endTime,
-                                workingSubject = workingSubject.value,
-                                date = state.date
-                            )
-                        )
-                    }
-                }
+    fun start() = scope.launch {
+        if (state.value.isActive) {
+            saveInterval()
         }
+        stopWatch.start()
     }
 
-    fun start() = stopWatch.start()
+    private suspend fun saveInterval() {
+        val state = stopWatch.state.value
+        repository.insert(
+            TimeTrackerEntity(
+                startTime = state.startTime,
+                endTime = state.endTime,
+                workingSubject = workingSubject.value,
+                date = state.date
+            )
+        )
+    }
 
     fun reset() = stopWatch.reset()
 
@@ -79,4 +76,14 @@ class TimeTracker @Inject constructor(
         this.workingSubject.update { workingSubject }
     }
 
+    fun startOrResetTimer(workingSubject: String) {
+        scope.launch {
+            if (state.value.isActive) {
+                saveInterval()
+                stopWatch.start()
+            }
+            onWorkingSubjectChanged(workingSubject)
+            stopWatch.start()
+        }
+    }
 }
