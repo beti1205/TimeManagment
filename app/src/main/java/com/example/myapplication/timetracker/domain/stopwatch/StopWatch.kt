@@ -19,22 +19,30 @@ class StopWatch @Inject constructor(private val scope: CoroutineScope) {
 
     private var counterJob: Job? = null
 
-    suspend fun start() {
+    fun toggleTimer() {
         if (state.value.isActive) {
-            counterJob?.cancel()
-            state.update {
-                it.copy(
-                    isActive = false
-                )
-            }
+            stop()
         } else {
-            counterJob = scope.launch { startCountingUp() }
-            state.update {
-                it.copy(
-                    isActive = true,
-                    timeElapsed = 0L
-                )
-            }
+            start()
+        }
+    }
+
+    fun start() {
+        counterJob = scope.launch { startCountingUp() }
+        state.update {
+            it.copy(
+                isActive = true,
+                timeElapsed = 0L
+            )
+        }
+    }
+
+    fun stop() {
+        counterJob?.cancel()
+        state.update {
+            it.copy(
+                isActive = false
+            )
         }
     }
 
@@ -49,7 +57,13 @@ class StopWatch @Inject constructor(private val scope: CoroutineScope) {
     private suspend fun startCountingUp() {
         var startTime = Instant.now()
 
-        state.update { it.copy(startTime = startTime, date = startTime.formatToLongDate()) }
+        state.update {
+            it.copy(
+                startTime = startTime,
+                date = startTime.formatToLongDate(),
+                endTime = startTime
+            )
+        }
 
         while (true) {
             val timeAmount = Instant.now().epochSecond - startTime.epochSecond

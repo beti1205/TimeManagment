@@ -57,8 +57,8 @@ fun TimeTrackerScreen(
         workingSubject = state.workingSubject,
         isSubjectErrorOccurred = state.isSubjectErrorOccurred,
         filteredSubjectList = state.filteredSubjectList,
-        onStart = viewModel::start,
-        onReset = viewModel::reset,
+        onTimerToggled = viewModel::toggleTimer,
+        onResetClicked = viewModel::reset,
         onSubjectErrorChanged = viewModel::onSubjectErrorChanged,
         onWorkingSubjectChanged = viewModel::onWorkingSubjectChanged,
         onNavigateToTimeSheet = onNavigateToTimeSheet
@@ -72,8 +72,8 @@ fun TimeTrackerScreen(
     workingSubject: String,
     isSubjectErrorOccurred: Boolean,
     filteredSubjectList: List<String>,
-    onStart: () -> Unit = {},
-    onReset: () -> Unit = {},
+    onTimerToggled: () -> Unit = {},
+    onResetClicked: () -> Unit = {},
     onSubjectErrorChanged: (Boolean) -> Unit = {},
     onWorkingSubjectChanged: (String) -> Unit = {},
     onNavigateToTimeSheet: () -> Unit
@@ -122,7 +122,7 @@ fun TimeTrackerScreen(
             Button(
                 onClick = {
                     if (workingSubject.isNotBlank()) {
-                        focusManager.clearFocus(); onStart()
+                        focusManager.clearFocus(); onTimerToggled()
                     } else {
                         onSubjectErrorChanged(true)
                     }
@@ -137,7 +137,7 @@ fun TimeTrackerScreen(
                 }
             }
             Button(
-                onClick = onReset,
+                onClick = onResetClicked,
                 shape = CircleShape,
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 7.dp)
             ) {

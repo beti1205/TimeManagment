@@ -1,5 +1,6 @@
 package com.example.myapplication.timesheet.presentation.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -12,15 +13,21 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.TooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,7 +41,9 @@ import com.example.myapplication.timesheet.domain.model.TimeTrackerInterval
 import com.example.myapplication.timetracker.domain.stopwatch.formatTime
 import com.example.myapplication.timetracker.domain.stopwatch.toTime
 import com.example.myapplication.utils.formatToTimeStr
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DaySectionIntervals(
     timeInterval: TimeTrackerInterval,
@@ -45,11 +54,26 @@ fun DaySectionIntervals(
     if (timeInterval.startTime != null && timeInterval.endTime != null) {
         ListItem(
             headlineContent = {
-                Text(
-                    text = timeInterval.workingSubject,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                val tooltipState = remember { TooltipState() }
+                val scope = rememberCoroutineScope()
+                TooltipBox(
+                    positionProvider = TooltipDefaults.rememberRichTooltipPositionProvider(),
+                    tooltip = {
+                        RichTooltip {
+                            Text(
+                                text = timeInterval.workingSubject,
+                            )
+                        }
+                    },
+                    state = tooltipState
+                ) {
+                    Text(
+                        text = timeInterval.workingSubject,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.clickable { scope.launch { tooltipState.show() } }
+                    )
+                }
             },
             supportingContent = {
                 Row {

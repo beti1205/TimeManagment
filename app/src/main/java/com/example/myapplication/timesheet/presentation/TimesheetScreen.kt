@@ -52,8 +52,8 @@ fun TimesheetScreen(
         onResetActionClicked = viewModel::reset,
         onDateChanged = viewModel::onDateChanged,
         onAddClicked = viewModel::onAddClicked,
-        onSearchTextChange = viewModel::onSearchTextChange,
-        onToggleSearch = viewModel::onToggleSearch,
+        onSearchTextChanged = viewModel::onSearchTextChanged,
+        onSearchToggled = viewModel::onSearchToggled,
         onSubjectSelected = viewModel::onSubjectSelected
     )
 }
@@ -72,8 +72,8 @@ fun TimesheetScreen(
     onResetActionClicked: () -> Unit,
     onDateChanged: (String) -> Unit,
     onAddClicked: () -> Unit,
-    onSearchTextChange: (String) -> Unit,
-    onToggleSearch: () -> Unit,
+    onSearchTextChanged: (String) -> Unit,
+    onSearchToggled: () -> Unit,
     onSubjectSelected: (String) -> Unit
 ) {
     var idToBeDeleted: Int? by remember { mutableStateOf(null) }
@@ -133,8 +133,8 @@ fun TimesheetScreen(
                 isSearching = state.searchBarState.isSearching,
                 searchText = state.searchBarState.searchText,
                 subjects = state.subjects,
-                onSearchTextChange = onSearchTextChange,
-                onToogleSearch = onToggleSearch,
+                onSearchTextChange = onSearchTextChanged,
+                onSearchToggled = onSearchToggled,
                 onSubjectSelected = onSubjectSelected
             )
         },
@@ -219,8 +219,8 @@ fun TimeSheetScreenPreview() {
         onResetActionClicked = {},
         onDateChanged = {},
         onAddClicked = {},
-        onToggleSearch = {},
-        onSearchTextChange = {},
+        onSearchToggled = {},
+        onSearchTextChanged = {},
         onSubjectSelected = {}
     )
 }

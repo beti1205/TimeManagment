@@ -43,7 +43,7 @@ class TimeTrackerService : LifecycleService() {
             Actions.START.toString() -> start()
             Actions.STOP.toString() -> stopSelf()
             Actions.RESET.toString() -> timeTracker.reset()
-            Actions.PAUSE.toString() -> timeTracker.start()
+            Actions.PAUSE.toString() -> timeTracker.toggleTimer()
 
         }
         return super.onStartCommand(intent, flags, startId)

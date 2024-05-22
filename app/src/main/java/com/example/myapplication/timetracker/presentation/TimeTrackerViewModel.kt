@@ -47,8 +47,8 @@ class TimeTrackerViewModel @Inject constructor(
 
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), TimeTrackerScreenState())
 
-    fun start() {
-        timeTracker.start()
+    fun toggleTimer() {
+        timeTracker.toggleTimer()
     }
 
     fun reset() {

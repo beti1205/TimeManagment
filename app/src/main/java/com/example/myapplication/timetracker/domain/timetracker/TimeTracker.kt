@@ -51,11 +51,11 @@ class TimeTracker @Inject constructor(
             initialValue = TimeTrackerState()
         )
 
-    fun start() = scope.launch {
+    fun toggleTimer() = scope.launch {
         if (state.value.isActive) {
             saveInterval()
         }
-        stopWatch.start()
+        stopWatch.toggleTimer()
     }
 
     private suspend fun saveInterval() {
@@ -80,7 +80,7 @@ class TimeTracker @Inject constructor(
         scope.launch {
             if (state.value.isActive) {
                 saveInterval()
-                stopWatch.start()
+                stopWatch.stop()
             }
             onWorkingSubjectChanged(workingSubject)
             stopWatch.start()

@@ -272,16 +272,16 @@ class TimesheetViewModel @Inject constructor(
         timeTracker.reset()
     }
 
-    fun onSearchTextChange(text: String) {
+    fun onSearchTextChanged(text: String) {
         searchBarState.value = searchBarState.value.copy(
             searchText = text
         )
     }
 
-    fun onToggleSearch() {
+    fun onSearchToggled() {
         onIsSearchingChanged()
         if (!searchBarState.value.isSearching) {
-            onSearchTextChange("")
+            onSearchTextChanged("")
         }
     }
 
@@ -293,6 +293,6 @@ class TimesheetViewModel @Inject constructor(
 
     fun onSubjectSelected(subject: String) {
         onIsSearchingChanged()
-        onSearchTextChange(subject)
+        onSearchTextChanged(subject)
     }
 }

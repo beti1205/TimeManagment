@@ -29,7 +29,7 @@ fun SearchBar(
     searchText: String,
     subjects: List<String>,
     onSearchTextChange: (String) -> Unit,
-    onToogleSearch: () -> Unit,
+    onSearchToggled: () -> Unit,
     onSubjectSelected: (String) -> Unit
 ) {
     SearchBar(
@@ -37,12 +37,12 @@ fun SearchBar(
         onQueryChange = onSearchTextChange,
         onSearch = onSearchTextChange,
         active = isSearching,
-        onActiveChange = { onToogleSearch() },
+        onActiveChange = { onSearchToggled() },
         placeholder = { Text("Search") },
         leadingIcon = {
             if (isSearching) {
                 IconButton(
-                    onClick = { onToogleSearch() },
+                    onClick = { onSearchToggled() },
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
