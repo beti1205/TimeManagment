@@ -54,6 +54,11 @@ fun Long.formatToDateWithoutDash(): String {
     return formatter.format(date)
 }
 
+fun Long.formatToLongDate(): String {
+    val date = Instant.ofEpochMilli(this)
+    return date.formatToLongDate()
+}
+
 fun formatToInstantWithAdditionalDay(date: String, time: Time): Instant {
     val timeString = "${time.hours}:${time.minutes}:${time.seconds}"
     val strDateTime = date + "T" + timeString

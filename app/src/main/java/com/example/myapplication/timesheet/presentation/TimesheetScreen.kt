@@ -25,6 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
 import com.example.myapplication.timesheet.domain.model.TimeTrackerInterval
 import com.example.myapplication.timesheet.presentation.components.AddEditTimeIntervalDialog
+import com.example.myapplication.timesheet.presentation.components.datefilter.DateFilter
 import com.example.myapplication.timesheet.presentation.components.DatePickerDialogContent
 import com.example.myapplication.timesheet.presentation.components.DeleteDialog
 import com.example.myapplication.timesheet.presentation.components.SearchBar
@@ -41,6 +42,7 @@ fun TimesheetScreen(
 
     TimesheetScreen(
         state = state,
+        filterDateOptions = viewModel.filterDateOptions,
         onDeleteTimeInterval = viewModel::deleteTimeInterval,
         onSaveClicked = viewModel::onSaveClicked,
         onSubjectChanged = viewModel::onSubjectChanged,
@@ -54,13 +56,15 @@ fun TimesheetScreen(
         onAddClicked = viewModel::onAddClicked,
         onSearchTextChanged = viewModel::onSearchTextChanged,
         onSearchToggled = viewModel::onSearchToggled,
-        onSubjectSelected = viewModel::onSubjectSelected
+        onSubjectSelected = viewModel::onSubjectSelected,
+        onSelectedFilterChanged = viewModel::onSelectedFilterChanged
     )
 }
 
 @Composable
 fun TimesheetScreen(
     state: TimesheetScreenState,
+    filterDateOptions: List<DateFilterType>,
     onDeleteTimeInterval: (Int) -> Unit,
     onSaveClicked: () -> Unit,
     onSubjectChanged: (String) -> Unit,
@@ -74,7 +78,8 @@ fun TimesheetScreen(
     onAddClicked: () -> Unit,
     onSearchTextChanged: (String) -> Unit,
     onSearchToggled: () -> Unit,
-    onSubjectSelected: (String) -> Unit
+    onSubjectSelected: (String) -> Unit,
+    onSelectedFilterChanged: (DateFilterType) -> Unit
 ) {
     var idToBeDeleted: Int? by remember { mutableStateOf(null) }
     val scope = rememberCoroutineScope()
@@ -133,9 +138,12 @@ fun TimesheetScreen(
                 isSearching = state.searchBarState.isSearching,
                 searchText = state.searchBarState.searchText,
                 subjects = state.subjects,
-                onSearchTextChange = onSearchTextChanged,
+                selectedFilter = state.selectedFilter,
+                filterDateOptions = filterDateOptions,
+                onSearchTextChanged = onSearchTextChanged,
                 onSearchToggled = onSearchToggled,
-                onSubjectSelected = onSubjectSelected
+                onSubjectSelected = onSubjectSelected,
+                onSelectedFilterChanged = onSelectedFilterChanged
             )
         },
         snackbarHost = {
@@ -149,6 +157,13 @@ fun TimesheetScreen(
         }
     ) { contentPadding ->
         Column(modifier = Modifier.padding(contentPadding)) {
+            if (state.selectedFilter != DateFilterType.ALL) {
+                DateFilter(
+                    selectedFilter = state.selectedFilter,
+                    filterDateOptions = filterDateOptions,
+                    onSelectedFilterChanged = onSelectedFilterChanged
+                )
+            }
             TimeIntervalsList(
                 daySections = state.daySections,
                 onDeleteClicked = { idToBeDeleted = it },
@@ -208,6 +223,7 @@ fun TimeSheetScreenPreview() {
             searchBarState = SearchBarState(),
             subjects = emptyList()
         ),
+        filterDateOptions = emptyList(),
         onDeleteTimeInterval = {},
         onSaveClicked = {},
         onSubjectChanged = {},
@@ -221,6 +237,7 @@ fun TimeSheetScreenPreview() {
         onAddClicked = {},
         onSearchToggled = {},
         onSearchTextChanged = {},
-        onSubjectSelected = {}
+        onSubjectSelected = {},
+        onSelectedFilterChanged = {}
     )
 }

@@ -16,6 +16,7 @@ import com.example.myapplication.utils.formatDateWithDash
 import com.example.myapplication.utils.formatToDateWithoutDash
 import com.example.myapplication.utils.formatToInstant
 import com.example.myapplication.utils.formatToInstantWithAdditionalDay
+import com.example.myapplication.utils.formatToLongDate
 import com.example.myapplication.utils.formatToTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
+import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,20 +42,31 @@ class TimesheetViewModel @Inject constructor(
     private val timeTracker: TimeTracker,
 ) : ViewModel() {
 
+    val filterDateOptions: List<DateFilterType> = DateFilterType.entries.toList()
+
     private val addEditIntervalDialogState: MutableStateFlow<AddEditIntervalDialogState?> =
         MutableStateFlow(null)
 
     private val searchBarState: MutableStateFlow<SearchBarState> =
         MutableStateFlow(SearchBarState())
 
+    private val selectedFilter: MutableStateFlow<DateFilterType> =
+        MutableStateFlow(DateFilterType.ALL)
+
     val state: StateFlow<TimesheetScreenState> = combine(
         getTimeTrackerIntervalsUseCase(),
         addEditIntervalDialogState,
-        searchBarState
-    ) { daySections, editIntervalDialogState, searchBar ->
+        searchBarState,
+        selectedFilter
+    ) { daySections, editIntervalDialogState, searchBar, selectedFilter ->
 
         val searchText = searchBar.searchText
-        val subjects = daySections
+        val filteredDaySectionsByDay = getFilteredDaySectionsByDay(
+            selectedFilter = selectedFilter,
+            daySections = daySections
+        )
+
+        val subjects = filteredDaySectionsByDay
             .flatMap { daySection ->
                 daySection.timeIntervals.map { it.workingSubject }
             }
@@ -64,18 +79,21 @@ class TimesheetViewModel @Inject constructor(
             }
 
         val filteredDaySections = if (searchText.isNotEmpty() && !searchBar.isSearching) {
-            daySections.mapNotNull { section ->
-                getFilteredDaySection(section, searchText)
+            filteredDaySectionsByDay.mapNotNull { section ->
+                getFilteredDaySectionBySubject(section, searchText)
             }
         } else {
-            daySections
+            filteredDaySectionsByDay
         }
 
+        val daySectionsSortedByDates = filteredDaySections.sortedByDescending { it.headerDate }
+
         TimesheetScreenState(
-            daySections = filteredDaySections,
+            daySections = daySectionsSortedByDates,
             addEditIntervalDialogState = editIntervalDialogState,
             searchBarState = searchBar,
-            subjects = subjects
+            subjects = subjects,
+            selectedFilter = selectedFilter
         )
     }.stateIn(
         scope = viewModelScope,
@@ -83,7 +101,7 @@ class TimesheetViewModel @Inject constructor(
         initialValue = TimesheetScreenState()
     )
 
-    private fun getFilteredDaySection(
+    private fun getFilteredDaySectionBySubject(
         section: DaySection,
         searchText: String
     ): DaySection? {
@@ -101,6 +119,50 @@ class TimesheetViewModel @Inject constructor(
         } else {
             null
         }
+    }
+
+    private fun getFilteredDaySectionsByDay(
+        selectedFilter: DateFilterType,
+        daySections: List<DaySection>
+    ): List<DaySection> {
+        return when (selectedFilter) {
+            DateFilterType.ALL -> daySections
+            DateFilterType.TODAY -> daySections.filter { daySection ->
+                daySection.headerDate == Instant.now().formatToLongDate()
+            }
+
+            DateFilterType.YESTERDAY -> daySections.filter { daySection ->
+                daySection.headerDate == (Instant.now().minus(Duration.ofDays(1))
+                    .formatToLongDate())
+            }
+
+            DateFilterType.THIS_WEEK -> {
+                daySections.filter { daySection ->
+                    dateContainsInWeek(daySection)
+                }
+            }
+
+            DateFilterType.LAST_WEEK -> {
+                daySections.filter { daySection ->
+                    dateContainsInWeek(daySection = daySection, lastWeek = true)
+                }
+            }
+        }
+    }
+
+    private fun dateContainsInWeek(daySection: DaySection, lastWeek: Boolean = false): Boolean {
+        val dateString = daySection.headerDate
+        val inputDate = LocalDate.parse(dateString)
+        val currentDate = LocalDate.now()
+        val startOfWeek =
+            if (lastWeek) currentDate.minusWeeks(1).with(DayOfWeek.MONDAY) else currentDate.with(
+                DayOfWeek.MONDAY
+            )
+        val endOfWeek =
+            if (lastWeek) currentDate.minusWeeks(1).with(DayOfWeek.SUNDAY) else currentDate.with(
+                DayOfWeek.SUNDAY
+            )
+        return inputDate in startOfWeek..endOfWeek
     }
 
     fun deleteTimeInterval(id: Int) = viewModelScope.launch {
@@ -295,4 +357,16 @@ class TimesheetViewModel @Inject constructor(
         onIsSearchingChanged()
         onSearchTextChanged(subject)
     }
+
+    fun onSelectedFilterChanged(filterType: DateFilterType) {
+        selectedFilter.value = filterType
+    }
+}
+
+enum class DateFilterType(val strName: String) {
+    ALL("all"),
+    TODAY("today"),
+    YESTERDAY("yesterday"),
+    THIS_WEEK("this week"),
+    LAST_WEEK("last week")
 }
