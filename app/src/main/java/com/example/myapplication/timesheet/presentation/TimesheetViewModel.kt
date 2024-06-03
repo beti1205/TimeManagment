@@ -42,7 +42,14 @@ class TimesheetViewModel @Inject constructor(
     private val timeTracker: TimeTracker,
 ) : ViewModel() {
 
-    val filterDateOptions: List<DateFilterType> = DateFilterType.entries.toList()
+    val filterDateOptions: List<DateFilterType> = listOf(
+        DateFilterType.All,
+        DateFilterType.Today,
+        DateFilterType.Yesterday,
+        DateFilterType.ThisWeek,
+        DateFilterType.LastWeek,
+        DateFilterType.CustomRange(null, null)
+    )
 
     private val addEditIntervalDialogState: MutableStateFlow<AddEditIntervalDialogState?> =
         MutableStateFlow(null)
@@ -51,7 +58,7 @@ class TimesheetViewModel @Inject constructor(
         MutableStateFlow(SearchBarState())
 
     private val selectedFilter: MutableStateFlow<DateFilterType> =
-        MutableStateFlow(DateFilterType.ALL)
+        MutableStateFlow(DateFilterType.All)
 
     val state: StateFlow<TimesheetScreenState> = combine(
         getTimeTrackerIntervalsUseCase(),
@@ -66,25 +73,17 @@ class TimesheetViewModel @Inject constructor(
             daySections = daySections
         )
 
-        val subjects = filteredDaySectionsByDay
-            .flatMap { daySection ->
-                daySection.timeIntervals.map { it.workingSubject }
-            }
-            .distinct()
-            .filter { subject ->
-                searchText.isBlank() || subject.contains(
-                    searchText.trim(),
-                    true
-                )
-            }
+        val subjects = getFilteredSubjects(
+            filteredDaySectionsByDay = filteredDaySectionsByDay,
+            isSearching = searchBar.isSearching,
+            searchText = searchText
+        )
 
-        val filteredDaySections = if (searchText.isNotEmpty() && !searchBar.isSearching) {
-            filteredDaySectionsByDay.mapNotNull { section ->
-                getFilteredDaySectionBySubject(section, searchText)
-            }
-        } else {
-            filteredDaySectionsByDay
-        }
+        val filteredDaySections = getFilteredDaySections(
+            searchText = searchText,
+            isSearching = !searchBar.isSearching,
+            filteredDaySectionsByDay = filteredDaySectionsByDay
+        )
 
         val daySectionsSortedByDates = filteredDaySections.sortedByDescending { it.headerDate }
 
@@ -100,6 +99,38 @@ class TimesheetViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(500L),
         initialValue = TimesheetScreenState()
     )
+
+    private fun getFilteredDaySections(
+        searchText: String,
+        isSearching: Boolean,
+        filteredDaySectionsByDay: List<DaySection>
+    ) = if (searchText.isNotEmpty() && isSearching) {
+        filteredDaySectionsByDay.mapNotNull { section ->
+            getFilteredDaySectionBySubject(section, searchText)
+        }
+    } else {
+        filteredDaySectionsByDay
+    }
+
+    private fun getFilteredSubjects(
+        filteredDaySectionsByDay: List<DaySection>,
+        isSearching: Boolean,
+        searchText: String
+    ) = if (filteredDaySectionsByDay.isNotEmpty() && isSearching) {
+        filteredDaySectionsByDay
+            .flatMap { daySection ->
+                daySection.timeIntervals.map { it.workingSubject }
+            }
+            .distinct()
+            .filter { subject ->
+                searchText.isBlank() || subject.contains(
+                    searchText.trim(),
+                    true
+                )
+            }
+    } else {
+        emptyList()
+    }
 
     private fun getFilteredDaySectionBySubject(
         section: DaySection,
@@ -126,28 +157,43 @@ class TimesheetViewModel @Inject constructor(
         daySections: List<DaySection>
     ): List<DaySection> {
         return when (selectedFilter) {
-            DateFilterType.ALL -> daySections
-            DateFilterType.TODAY -> daySections.filter { daySection ->
+            is DateFilterType.All -> daySections
+            is DateFilterType.Today -> daySections.filter { daySection ->
                 daySection.headerDate == Instant.now().formatToLongDate()
             }
 
-            DateFilterType.YESTERDAY -> daySections.filter { daySection ->
+            is DateFilterType.Yesterday -> daySections.filter { daySection ->
                 daySection.headerDate == (Instant.now().minus(Duration.ofDays(1))
                     .formatToLongDate())
             }
 
-            DateFilterType.THIS_WEEK -> {
+            is DateFilterType.ThisWeek -> {
                 daySections.filter { daySection ->
                     dateContainsInWeek(daySection)
                 }
             }
 
-            DateFilterType.LAST_WEEK -> {
+            is DateFilterType.LastWeek -> {
                 daySections.filter { daySection ->
                     dateContainsInWeek(daySection = daySection, lastWeek = true)
                 }
             }
+
+            is DateFilterType.CustomRange -> daySections.filter { daySection ->
+                dateContainsInCustomRange(daySection, selectedFilter)
+            }
         }
+    }
+
+    private fun dateContainsInCustomRange(
+        daySection: DaySection,
+        selectedFilter: DateFilterType.CustomRange
+    ): Boolean {
+        val dateString = daySection.headerDate
+        val inputDate = LocalDate.parse(dateString)
+        val startDate = LocalDate.parse(selectedFilter.startDate)
+        val endDate = LocalDate.parse(selectedFilter.endDate)
+        return inputDate in startDate..endDate
     }
 
     private fun dateContainsInWeek(daySection: DaySection, lastWeek: Boolean = false): Boolean {
@@ -363,10 +409,11 @@ class TimesheetViewModel @Inject constructor(
     }
 }
 
-enum class DateFilterType(val strName: String) {
-    ALL("all"),
-    TODAY("today"),
-    YESTERDAY("yesterday"),
-    THIS_WEEK("this week"),
-    LAST_WEEK("last week")
+sealed class DateFilterType {
+    data object All : DateFilterType()
+    data object Today : DateFilterType()
+    data object Yesterday : DateFilterType()
+    data object ThisWeek : DateFilterType()
+    data object LastWeek : DateFilterType()
+    data class CustomRange(val startDate: String?, val endDate: String?) : DateFilterType()
 }

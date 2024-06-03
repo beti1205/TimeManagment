@@ -65,7 +65,7 @@ fun AddEditTimeIntervalDialog(
                         onValueChange = { if (it.length <= DateDefaults.DATE_LENGTH) onDateChanged(it) },
                         label = {
                             Text(
-                                text = "Start date",
+                                text = stringResource(R.string.edit_dialog_start_date_label),
                                 fontWeight = FontWeight.Bold
                             )
                         },
@@ -76,7 +76,7 @@ fun AddEditTimeIntervalDialog(
                         isError = state.isWrongDateError,
                         supportingText = {
                             if (state.isWrongDateError) {
-                                Text("Incorrect date was entered")
+                                Text(stringResource(R.string.edit_dialog_error_supporting_text))
                             }
                         },
                         trailingIcon = {

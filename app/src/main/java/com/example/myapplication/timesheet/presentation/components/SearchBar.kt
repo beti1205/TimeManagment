@@ -23,7 +23,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 import com.example.myapplication.timesheet.presentation.DateFilterType
 import com.example.myapplication.timesheet.presentation.components.datefilter.DateFilter
 
@@ -48,7 +50,7 @@ fun SearchBar(
         onSearch = onSearchTextChanged,
         active = isSearching,
         onActiveChange = { onSearchToggled() },
-        placeholder = { Text("Search") },
+        placeholder = { Text(stringResource(R.string.search_bar_search_placeholder)) },
         leadingIcon = {
             SearchBarLeadingIconButton(
                 isSearching = isSearching,
@@ -137,14 +139,14 @@ private fun SearchBarLeadingIconButton(
     onSelectedFilterChanged: (DateFilterType) -> Unit,
     onFocusRequested: () -> Unit
 ) {
-    if (isSearching || selectedFilter != DateFilterType.ALL || searchText.isNotEmpty()) {
+    if (isSearching || selectedFilter != DateFilterType.All || searchText.isNotEmpty()) {
         IconButton(
             onClick = {
                 if (isSearching) {
                     onSearchToggled()
                 } else {
                     onSearchTextChanged("")
-                    onSelectedFilterChanged(DateFilterType.ALL)
+                    onSelectedFilterChanged(DateFilterType.All)
                 }
             },
         ) {

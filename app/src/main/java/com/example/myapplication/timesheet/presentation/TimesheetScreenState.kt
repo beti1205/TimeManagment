@@ -7,7 +7,7 @@ data class TimesheetScreenState(
     val addEditIntervalDialogState: AddEditIntervalDialogState? = null,
     val searchBarState: SearchBarState = SearchBarState(),
     val subjects: List<String> = emptyList(),
-    val selectedFilter: DateFilterType = DateFilterType.ALL
+    val selectedFilter: DateFilterType = DateFilterType.All
 )
 
 data class AddEditIntervalDialogState(

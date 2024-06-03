@@ -7,6 +7,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.example.myapplication.R
 import com.example.myapplication.timesheet.presentation.AddEditIntervalDialogState
 import com.example.myapplication.utils.TimePickerDialog
 
@@ -55,12 +57,12 @@ fun TimePickerDialogContent(
                     }
                     onDismiss()
                 }
-            ) { Text("OK") }
+            ) { Text(stringResource(id = R.string.dialog_confirm_button)) }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss
-            ) { Text("Cancel") }
+            ) { Text(stringResource(id = R.string.dialog_dismiss_button)) }
         },
     ) {
         TimePicker(

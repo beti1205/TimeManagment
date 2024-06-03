@@ -13,4 +13,16 @@
     <string name="edit_dialog_start_time_text_field">Start time</string>
     <string name="edit_dialog_end_time_text_field">End time</string>
     <string name="incorrect_time_was_entered">Incorrect time was entered</string>
+    <string name="date_filter_all">All</string>
+    <string name="date_filter_last_week">Last week</string>
+    <string name="date_filter_this_week">This week</string>
+    <string name="date_filter_today">Today</string>
+    <string name="date_filter_yesterday">Yesterday</string>
+    <string name="bottom_sheet_date_title">Date</string>
+    <string name="bottom_sheet_custom">Custom</string>
+    <string name="dialog_confirm_button">OK</string>
+    <string name="dialog_dismiss_button">Cancel</string>
+    <string name="edit_dialog_start_date_label">Start date</string>
+    <string name="edit_dialog_error_supporting_text">Incorrect date was entered</string>
+    <string name="search_bar_search_placeholder">Search</string>
 </resources>

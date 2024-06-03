@@ -7,6 +7,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.example.myapplication.R
 import com.example.myapplication.utils.formatToDateWithoutDash
 
 @Composable
@@ -29,12 +31,12 @@ fun DatePickerDialogContent(
                     }
                     onDismissDatePickerDialog()
                 }
-            ) { Text("OK") }
+            ) { Text(stringResource(id = R.string.dialog_confirm_button)) }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismissDatePickerDialog
-            ) { Text("Cancel") }
+            ) { Text(stringResource(id = R.string.dialog_dismiss_button)) }
         }
     ) {
         DatePicker(state = datePickerState)

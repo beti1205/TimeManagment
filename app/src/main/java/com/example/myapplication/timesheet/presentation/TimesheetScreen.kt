@@ -1,9 +1,12 @@
 package com.example.myapplication.timesheet.presentation
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.rounded.SearchOff
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -11,6 +14,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -18,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -157,36 +162,47 @@ fun TimesheetScreen(
         }
     ) { contentPadding ->
         Column(modifier = Modifier.padding(contentPadding)) {
-            if (state.selectedFilter != DateFilterType.ALL) {
+            if (state.selectedFilter != DateFilterType.All) {
                 DateFilter(
                     selectedFilter = state.selectedFilter,
                     filterDateOptions = filterDateOptions,
                     onSelectedFilterChanged = onSelectedFilterChanged
                 )
             }
-            TimeIntervalsList(
-                daySections = state.daySections,
-                onDeleteClicked = { idToBeDeleted = it },
-                onEditClicked = onEditClicked,
-                onTimeTrackerStarted = { subject ->
-                    onTimeTrackerStarted(subject)
-                    scope.launch {
-                        val result = snackbarHostState.showSnackbar(
-                            message = "Time tracker started",
-                            actionLabel = "Reset",
-                            duration = SnackbarDuration.Short
-                        )
-                        when (result) {
-                            SnackbarResult.ActionPerformed -> {
-                                onResetActionClicked()
+            if (state.daySections.isNotEmpty()) {
+                TimeIntervalsList(
+                    daySections = state.daySections,
+                    onDeleteClicked = { idToBeDeleted = it },
+                    onEditClicked = onEditClicked,
+                    onTimeTrackerStarted = { subject ->
+                        onTimeTrackerStarted(subject)
+                        scope.launch {
+                            val result = snackbarHostState.showSnackbar(
+                                message = "Time tracker started",
+                                actionLabel = "Reset",
+                                duration = SnackbarDuration.Short
+                            )
+                            when (result) {
+                                SnackbarResult.ActionPerformed -> {
+                                    onResetActionClicked()
+                                }
+
+                                SnackbarResult.Dismissed -> Unit
                             }
 
-                            SnackbarResult.Dismissed -> Unit
                         }
-
-                    }
-                },
-            )
+                    },
+                )
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(imageVector = Icons.Rounded.SearchOff, contentDescription = null)
+                    Text(text = "No matches for this search")
+                }
+            }
         }
     }
 }

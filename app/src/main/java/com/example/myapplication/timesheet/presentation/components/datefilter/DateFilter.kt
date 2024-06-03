@@ -22,9 +22,10 @@ fun DateFilter(
     if (showDateRangePicker) {
         DateRangePickerDialog(
             onDismiss = { showDateRangePicker = false },
-            onSaveSelectedDate = { dateRange ->
-//                    selectedDate = dateRange
+            onSaveSelectedDate = { startDate, endDate ->
+                onSelectedFilterChanged(DateFilterType.CustomRange(startDate, endDate))
                 showBottomSheet = false
+                onSearchToggled()
             }
         )
     }

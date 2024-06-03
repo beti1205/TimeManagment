@@ -20,8 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 import com.example.myapplication.timesheet.presentation.DateFilterType
 import kotlinx.coroutines.launch
 
@@ -61,10 +63,13 @@ fun DateBottomSheet(
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Date", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = stringResource(R.string.bottom_sheet_date_title),
+                    style = MaterialTheme.typography.titleMedium
+                )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = "Custom",
+                    text = stringResource(R.string.bottom_sheet_custom),
                     style = MaterialTheme.typography.titleMedium.copy(
                         color = MaterialTheme.colorScheme.primary
                     ),
@@ -76,19 +81,34 @@ fun DateBottomSheet(
             }
 
             filterDateOptions.forEach { date ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    RadioButton(
-                        selected = date == selectedFilter,
-                        onClick = {
-                            onSelectedDate(date)
-                            onDismissBottomSheet()
-                            onSearchToggled()
-                        }
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(text = date.strName, style = MaterialTheme.typography.bodyMedium)
-                }
+                if (date != DateFilterType.CustomRange(null, null))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = date == selectedFilter,
+                            onClick = {
+                                onSelectedDate(date)
+                                onDismissBottomSheet()
+                                onSearchToggled()
+                            }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = getFilterName(date),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
             }
         }
     }
 }
+
+@Composable
+fun getFilterName(date: DateFilterType) =
+    when (date) {
+        DateFilterType.All -> stringResource(R.string.date_filter_all)
+        is DateFilterType.CustomRange -> "${date.startDate}..${date.endDate}"
+        DateFilterType.LastWeek -> stringResource(R.string.date_filter_last_week)
+        DateFilterType.ThisWeek -> stringResource(R.string.date_filter_this_week)
+        DateFilterType.Today -> stringResource(R.string.date_filter_today)
+        DateFilterType.Yesterday -> stringResource(R.string.date_filter_yesterday)
+    }

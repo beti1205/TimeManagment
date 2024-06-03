@@ -19,7 +19,7 @@ fun DateChip(
     InputChip(
         selected = false,
         onClick = onShowBottomSheetClicked,
-        label = { Text(selectedFilter.strName) },
+        label = { Text(getFilterName(date = selectedFilter)) },
         trailingIcon = {
             Icon(
                 imageVector = Icons.Rounded.KeyboardArrowDown,
