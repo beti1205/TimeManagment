@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.rounded.SearchOff
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -92,7 +93,6 @@ fun TimesheetScreen(
     var isStartTimePickerSelected: Boolean? by remember { mutableStateOf(null) }
     var showDatePicker by remember { mutableStateOf(false) }
 
-
     isStartTimePickerSelected?.let {
         TimePickerDialogContent(
             addEditDialogState = state.addEditIntervalDialogState,
@@ -115,7 +115,7 @@ fun TimesheetScreen(
             state = state,
             headerText = when {
                 state.id != null -> stringResource(id = R.string.edit_menu_item_label)
-                else -> "Add time entity"
+                else -> stringResource(R.string.add_dialog_header)
             },
             onDismissRequest = onDismissAddEditDialog,
             onSaveClicked = onSaveClicked,
@@ -156,7 +156,7 @@ fun TimesheetScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddClicked) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
+                Icon(Icons.Default.Add, contentDescription = null)
             }
 
         }
@@ -193,14 +193,22 @@ fun TimesheetScreen(
                         }
                     },
                 )
-            } else {
+            } else if (state.isNotFindingResults) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Icon(imageVector = Icons.Rounded.SearchOff, contentDescription = null)
-                    Text(text = "No matches for this search")
+                    Text(text = stringResource(R.string.search_no_matches_info))
+                }
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator()
                 }
             }
         }

@@ -1,4 +1,4 @@
-package com.example.myapplication.timesheet.domain.usecases
+package com.example.myapplication.timesheet.domain.usecases.validators
 
 import javax.inject.Inject
 

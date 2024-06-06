@@ -8,7 +8,10 @@ data class TimesheetScreenState(
     val searchBarState: SearchBarState = SearchBarState(),
     val subjects: List<String> = emptyList(),
     val selectedFilter: DateFilterType = DateFilterType.All
-)
+) {
+    val isNotFindingResults = daySections.isEmpty() && (selectedFilter != DateFilterType.All
+            || searchBarState.searchText.isNotBlank())
+}
 
 data class AddEditIntervalDialogState(
     val id: Int? = null,

@@ -3,20 +3,20 @@ package com.example.myapplication.timesheet.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.timesheet.domain.usecases.AddTimeIntervalUseCase
-import com.example.myapplication.timesheet.domain.usecases.DateValidator
+import com.example.myapplication.timesheet.domain.usecases.validators.ValidateDate
 import com.example.myapplication.timesheet.domain.usecases.DeleteTimeIntervalUseCase
+import com.example.myapplication.timesheet.domain.usecases.filtering.GetFilteredDaySectionsByDayUseCase
+import com.example.myapplication.timesheet.domain.usecases.filtering.GetFilteredDaySectionsUseCase
+import com.example.myapplication.timesheet.domain.usecases.filtering.GetFilteredSubjectsUseCase
 import com.example.myapplication.timesheet.domain.usecases.GetTimeTrackerIntervalsUseCase
 import com.example.myapplication.timesheet.domain.usecases.TimeIntervalParameters
-import com.example.myapplication.timesheet.domain.usecases.ValidateTime
+import com.example.myapplication.timesheet.domain.usecases.validators.ValidateTime
 import com.example.myapplication.timesheet.domain.usecases.UpdateTimeIntervalUseCase
-import com.example.myapplication.timetracker.domain.stopwatch.formatTime
-import com.example.myapplication.timetracker.domain.stopwatch.toTime
 import com.example.myapplication.timetracker.domain.timetracker.TimeTracker
 import com.example.myapplication.utils.formatDateWithDash
 import com.example.myapplication.utils.formatToDateWithoutDash
 import com.example.myapplication.utils.formatToInstant
 import com.example.myapplication.utils.formatToInstantWithAdditionalDay
-import com.example.myapplication.utils.formatToLongDate
 import com.example.myapplication.utils.formatToTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,10 +25,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.time.DayOfWeek
-import java.time.Duration
 import java.time.Instant
-import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,8 +35,11 @@ class TimesheetViewModel @Inject constructor(
     private val updateTimeIntervalUseCase: UpdateTimeIntervalUseCase,
     private val addTimeIntervalUseCase: AddTimeIntervalUseCase,
     private val validateTime: ValidateTime,
-    private val dateValidator: DateValidator,
+    private val validateDate: ValidateDate,
     private val timeTracker: TimeTracker,
+    private val getFilteredDaySectionsByDayUseCase: GetFilteredDaySectionsByDayUseCase,
+    private val getFilteredSubjectsUseCase: GetFilteredSubjectsUseCase,
+    private val getFilteredDaySectionsUseCase: GetFilteredDaySectionsUseCase
 ) : ViewModel() {
 
     val filterDateOptions: List<DateFilterType> = listOf(
@@ -68,18 +68,18 @@ class TimesheetViewModel @Inject constructor(
     ) { daySections, editIntervalDialogState, searchBar, selectedFilter ->
 
         val searchText = searchBar.searchText
-        val filteredDaySectionsByDay = getFilteredDaySectionsByDay(
+        val filteredDaySectionsByDay = getFilteredDaySectionsByDayUseCase(
             selectedFilter = selectedFilter,
             daySections = daySections
         )
 
-        val subjects = getFilteredSubjects(
+        val subjects = getFilteredSubjectsUseCase(
             filteredDaySectionsByDay = filteredDaySectionsByDay,
             isSearching = searchBar.isSearching,
             searchText = searchText
         )
 
-        val filteredDaySections = getFilteredDaySections(
+        val filteredDaySections = getFilteredDaySectionsUseCase(
             searchText = searchText,
             isSearching = !searchBar.isSearching,
             filteredDaySectionsByDay = filteredDaySectionsByDay
@@ -99,117 +99,6 @@ class TimesheetViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(500L),
         initialValue = TimesheetScreenState()
     )
-
-    private fun getFilteredDaySections(
-        searchText: String,
-        isSearching: Boolean,
-        filteredDaySectionsByDay: List<DaySection>
-    ) = if (searchText.isNotEmpty() && isSearching) {
-        filteredDaySectionsByDay.mapNotNull { section ->
-            getFilteredDaySectionBySubject(section, searchText)
-        }
-    } else {
-        filteredDaySectionsByDay
-    }
-
-    private fun getFilteredSubjects(
-        filteredDaySectionsByDay: List<DaySection>,
-        isSearching: Boolean,
-        searchText: String
-    ) = if (filteredDaySectionsByDay.isNotEmpty() && isSearching) {
-        filteredDaySectionsByDay
-            .flatMap { daySection ->
-                daySection.timeIntervals.map { it.workingSubject }
-            }
-            .distinct()
-            .filter { subject ->
-                searchText.isBlank() || subject.contains(
-                    searchText.trim(),
-                    true
-                )
-            }
-    } else {
-        emptyList()
-    }
-
-    private fun getFilteredDaySectionBySubject(
-        section: DaySection,
-        searchText: String
-    ): DaySection? {
-        val matchingIntervals = section.timeIntervals.filter { interval ->
-            interval.workingSubject == searchText
-        }
-
-        return if (matchingIntervals.isNotEmpty()) {
-            DaySection(
-                headerDate = section.headerDate,
-                headerTimeAmount = matchingIntervals.sumOf { it.timeElapsed }.toTime()
-                    .formatTime(),
-                timeIntervals = matchingIntervals
-            )
-        } else {
-            null
-        }
-    }
-
-    private fun getFilteredDaySectionsByDay(
-        selectedFilter: DateFilterType,
-        daySections: List<DaySection>
-    ): List<DaySection> {
-        return when (selectedFilter) {
-            is DateFilterType.All -> daySections
-            is DateFilterType.Today -> daySections.filter { daySection ->
-                daySection.headerDate == Instant.now().formatToLongDate()
-            }
-
-            is DateFilterType.Yesterday -> daySections.filter { daySection ->
-                daySection.headerDate == (Instant.now().minus(Duration.ofDays(1))
-                    .formatToLongDate())
-            }
-
-            is DateFilterType.ThisWeek -> {
-                daySections.filter { daySection ->
-                    dateContainsInWeek(daySection)
-                }
-            }
-
-            is DateFilterType.LastWeek -> {
-                daySections.filter { daySection ->
-                    dateContainsInWeek(daySection = daySection, lastWeek = true)
-                }
-            }
-
-            is DateFilterType.CustomRange -> daySections.filter { daySection ->
-                dateContainsInCustomRange(daySection, selectedFilter)
-            }
-        }
-    }
-
-    private fun dateContainsInCustomRange(
-        daySection: DaySection,
-        selectedFilter: DateFilterType.CustomRange
-    ): Boolean {
-        val dateString = daySection.headerDate
-        val inputDate = LocalDate.parse(dateString)
-        val startDate = LocalDate.parse(selectedFilter.startDate)
-        val endDate = LocalDate.parse(selectedFilter.endDate)
-        return inputDate in startDate..endDate
-    }
-
-    private fun dateContainsInWeek(daySection: DaySection, lastWeek: Boolean = false): Boolean {
-        val dateString = daySection.headerDate
-        val inputDate = LocalDate.parse(dateString)
-        val currentDate = LocalDate.now()
-        val startOfWeek =
-            if (lastWeek) currentDate.minusWeeks(1).with(DayOfWeek.MONDAY) else currentDate.with(
-                DayOfWeek.MONDAY
-            )
-        val endOfWeek =
-            if (lastWeek) currentDate.minusWeeks(1).with(DayOfWeek.SUNDAY) else currentDate.with(
-                DayOfWeek.SUNDAY
-            )
-        return inputDate in startOfWeek..endOfWeek
-    }
 
     fun deleteTimeInterval(id: Int) = viewModelScope.launch {
         deleteTimeIntervalUseCase(id)
@@ -288,7 +177,7 @@ class TimesheetViewModel @Inject constructor(
     fun onDateChanged(date: String) {
         addEditIntervalDialogState.value = addEditIntervalDialogState.value?.copy(
             date = date,
-            isWrongDateError = !dateValidator(date)
+            isWrongDateError = !validateDate(date)
         )
     }
 

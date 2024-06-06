@@ -25,4 +25,6 @@
     <string name="edit_dialog_start_date_label">Start date</string>
     <string name="edit_dialog_error_supporting_text">Incorrect date was entered</string>
     <string name="search_bar_search_placeholder">Search</string>
+    <string name="add_dialog_header">Add time entity</string>
+    <string name="search_no_matches_info">No matches for this search</string>
 </resources>
