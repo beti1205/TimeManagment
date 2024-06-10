@@ -26,7 +26,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
-import com.example.myapplication.timesheet.presentation.DateFilterType
+import com.example.myapplication.timesheet.presentation.DateFilter
 import com.example.myapplication.timesheet.presentation.components.datefilter.DateFilter
 
 @Composable
@@ -35,12 +35,12 @@ fun SearchBar(
     isSearching: Boolean,
     searchText: String,
     subjects: List<String>,
-    selectedFilter: DateFilterType,
-    filterDateOptions: List<DateFilterType>,
+    selectedFilter: DateFilter,
+    filterDateOptions: List<DateFilter>,
     onSearchTextChanged: (String) -> Unit,
     onSearchToggled: () -> Unit,
     onSubjectSelected: (String) -> Unit,
-    onSelectedFilterChanged: (DateFilterType) -> Unit
+    onSelectedFilterChanged: (DateFilter) -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
 
@@ -132,21 +132,21 @@ private fun SearchBarClearButton(
 @Composable
 private fun SearchBarLeadingIconButton(
     isSearching: Boolean,
-    selectedFilter: DateFilterType,
+    selectedFilter: DateFilter,
     searchText: String,
     onSearchToggled: () -> Unit,
     onSearchTextChanged: (String) -> Unit,
-    onSelectedFilterChanged: (DateFilterType) -> Unit,
+    onSelectedFilterChanged: (DateFilter) -> Unit,
     onFocusRequested: () -> Unit
 ) {
-    if (isSearching || selectedFilter != DateFilterType.All || searchText.isNotEmpty()) {
+    if (isSearching || selectedFilter != DateFilter.All || searchText.isNotEmpty()) {
         IconButton(
             onClick = {
                 if (isSearching) {
                     onSearchToggled()
                 } else {
                     onSearchTextChanged("")
-                    onSelectedFilterChanged(DateFilterType.All)
+                    onSelectedFilterChanged(DateFilter.All)
                 }
             },
         ) {

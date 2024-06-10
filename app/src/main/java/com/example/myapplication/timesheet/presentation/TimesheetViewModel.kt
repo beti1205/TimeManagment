@@ -12,12 +12,14 @@ import com.example.myapplication.timesheet.domain.usecases.GetTimeTrackerInterva
 import com.example.myapplication.timesheet.domain.usecases.TimeIntervalParameters
 import com.example.myapplication.timesheet.domain.usecases.validators.ValidateTime
 import com.example.myapplication.timesheet.domain.usecases.UpdateTimeIntervalUseCase
+import com.example.myapplication.timesheet.presentation.model.AddEditIntervalDialogState
+import com.example.myapplication.timesheet.presentation.model.SearchBarState
+import com.example.myapplication.timesheet.presentation.model.toInstant
+import com.example.myapplication.timesheet.presentation.model.toTime
 import com.example.myapplication.timetracker.domain.timetracker.TimeTracker
 import com.example.myapplication.utils.formatDateWithDash
 import com.example.myapplication.utils.formatToDateWithoutDash
-import com.example.myapplication.utils.formatToInstant
 import com.example.myapplication.utils.formatToInstantWithAdditionalDay
-import com.example.myapplication.utils.formatToTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -42,13 +44,13 @@ class TimesheetViewModel @Inject constructor(
     private val getFilteredDaySectionsUseCase: GetFilteredDaySectionsUseCase
 ) : ViewModel() {
 
-    val filterDateOptions: List<DateFilterType> = listOf(
-        DateFilterType.All,
-        DateFilterType.Today,
-        DateFilterType.Yesterday,
-        DateFilterType.ThisWeek,
-        DateFilterType.LastWeek,
-        DateFilterType.CustomRange(null, null)
+    val filterDateOptions: List<DateFilter> = listOf(
+        DateFilter.All,
+        DateFilter.Today,
+        DateFilter.Yesterday,
+        DateFilter.ThisWeek,
+        DateFilter.LastWeek,
+        DateFilter.CustomRange("", "")
     )
 
     private val addEditIntervalDialogState: MutableStateFlow<AddEditIntervalDialogState?> =
@@ -57,8 +59,8 @@ class TimesheetViewModel @Inject constructor(
     private val searchBarState: MutableStateFlow<SearchBarState> =
         MutableStateFlow(SearchBarState())
 
-    private val selectedFilter: MutableStateFlow<DateFilterType> =
-        MutableStateFlow(DateFilterType.All)
+    private val selectedFilter: MutableStateFlow<DateFilter> =
+        MutableStateFlow(DateFilter.All)
 
     val state: StateFlow<TimesheetScreenState> = combine(
         getTimeTrackerIntervalsUseCase(),
@@ -108,8 +110,8 @@ class TimesheetViewModel @Inject constructor(
         val interval = state.value.daySections.flatMap { it.timeIntervals }.first { interval ->
             interval.id == id
         }
-        val startTime = interval.startTime!!.formatToTime()
-        val endTime = interval.endTime!!.formatToTime()
+        val startTime = interval.startTime!!.toTime()
+        val endTime = interval.endTime!!.toTime()
 
         addEditIntervalDialogState.value = AddEditIntervalDialogState(
             id = id,
@@ -142,9 +144,7 @@ class TimesheetViewModel @Inject constructor(
             startTime = if (hasError) {
                 addEditIntervalDialogState.value?.startTime
             } else {
-                getTime(
-                    startTime
-                )
+                startTime.toTime()
             }
         )
     }
@@ -156,22 +156,9 @@ class TimesheetViewModel @Inject constructor(
             endTime = if (hasError) {
                 addEditIntervalDialogState.value?.endTime
             } else {
-                getTime(
-                    endTime
-                )
+                endTime.toTime()
             }
         )
-    }
-
-    private fun getTime(time: String): Time {
-        var adjustedTime = time
-        while (adjustedTime.length < 6) {
-            adjustedTime += " "
-        }
-        val hours = adjustedTime.substring(0, 2)
-        val minutes = adjustedTime.substring(2, 4)
-        val seconds = adjustedTime.substring(4, 6)
-        return Time(hours, minutes, seconds)
     }
 
     fun onDateChanged(date: String) {
@@ -185,30 +172,40 @@ class TimesheetViewModel @Inject constructor(
         addEditIntervalDialogState.value = null
     }
 
-    private fun editTimeIntervalEntity() = viewModelScope.launch {
-        addEditIntervalDialogState.value?.let {
-            if (it.startTime == null) return@launch
+    private fun editTimeInterval() = viewModelScope.launch {
+        addEditIntervalDialogState.value?.let { dialogState ->
+            if (dialogState.startTime == null) {
+                return@launch
+            }
+
             updateTimeIntervalUseCase(
                 TimeIntervalParameters(
-                    id = it.id!!,
-                    subject = it.subject,
-                    startTime = formatToInstant(date = it.date, time = it.startTime),
-                    endTime = saveEndTimeWithCorrectDay(),
-                    date = it.date
+                    id = dialogState.id!!,
+                    subject = dialogState.subject,
+                    startTime = dialogState.startTime.toInstant(
+                        date = dialogState.date
+                    ),
+                    endTime = getEndTimeWithCorrectDay(),
+                    date = dialogState.date
                 )
             )
         }
     }
 
-    private fun addTimeIntervalEntity() = viewModelScope.launch {
-        addEditIntervalDialogState.value?.let {
-            if (it.startTime == null) return@launch
+    private fun addTimeInterval() = viewModelScope.launch {
+        addEditIntervalDialogState.value?.let { dialogState ->
+            if (dialogState.startTime == null) {
+                return@launch
+            }
+
             addTimeIntervalUseCase(
                 TimeIntervalParameters(
-                    subject = it.subject,
-                    startTime = formatToInstant(date = it.date, time = it.startTime),
-                    endTime = saveEndTimeWithCorrectDay(),
-                    date = it.date
+                    subject = dialogState.subject,
+                    startTime = dialogState.startTime.toInstant(
+                        date = dialogState.date
+                    ),
+                    endTime = getEndTimeWithCorrectDay(),
+                    date = dialogState.date
                 )
             )
         }
@@ -218,30 +215,37 @@ class TimesheetViewModel @Inject constructor(
         saveFormattedTime()
         addEditIntervalDialogState.value?.let { editState ->
             if (editState.id != null) {
-                editTimeIntervalEntity()
+                editTimeInterval()
             } else {
-                addTimeIntervalEntity()
+                addTimeInterval()
             }
         }
     }
 
-    private fun saveEndTimeWithCorrectDay(): Instant {
+    private fun getEndTimeWithCorrectDay(): Instant {
         var endTime = Instant.now()
         addEditIntervalDialogState.value?.let { state ->
-            if (state.startTime == null || state.endTime == null) return@let
-            val editedEndTimeSmaller = isEditedEndTimeSmaller(
-                startTime = state.startTime,
-                endTime = state.endTime
-            )
-            endTime = when {
-                editedEndTimeSmaller -> formatToInstantWithAdditionalDay(
-                    state.date,
-                    state.endTime
-                )
+            val stateStartTime = state.startTime
+            val stateEndTime = state.endTime
 
-                else -> formatToInstant(state.date, state.endTime)
+            if (stateStartTime == null || stateEndTime == null) {
+                return@let
+            }
+
+            val difference = stateStartTime.compareTo(stateEndTime)
+
+            endTime = when {
+                difference > 0 -> {
+                    formatToInstantWithAdditionalDay(
+                        state.date,
+                        stateEndTime
+                    )
+                }
+
+                else -> { stateEndTime.toInstant(state.date) }
             }
         }
+
         return endTime
     }
 
@@ -249,16 +253,6 @@ class TimesheetViewModel @Inject constructor(
         addEditIntervalDialogState.value = addEditIntervalDialogState.value?.copy(
             date = addEditIntervalDialogState.value!!.date.formatDateWithDash()
         )
-    }
-
-    private fun isEditedEndTimeSmaller(startTime: Time, endTime: Time): Boolean {
-        if (startTime.hours != endTime.hours) {
-            return startTime.hours > endTime.hours
-        }
-        if (startTime.minutes != endTime.minutes) {
-            return startTime.minutes > endTime.minutes
-        }
-        return startTime.seconds > endTime.seconds
     }
 
     fun start(workingSubject: String) {
@@ -293,16 +287,7 @@ class TimesheetViewModel @Inject constructor(
         onSearchTextChanged(subject)
     }
 
-    fun onSelectedFilterChanged(filterType: DateFilterType) {
+    fun onSelectedFilterChanged(filterType: DateFilter) {
         selectedFilter.value = filterType
     }
-}
-
-sealed class DateFilterType {
-    data object All : DateFilterType()
-    data object Today : DateFilterType()
-    data object Yesterday : DateFilterType()
-    data object ThisWeek : DateFilterType()
-    data object LastWeek : DateFilterType()
-    data class CustomRange(val startDate: String?, val endDate: String?) : DateFilterType()
 }

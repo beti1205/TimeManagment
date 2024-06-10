@@ -24,21 +24,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
-import com.example.myapplication.timesheet.presentation.DateFilterType
+import com.example.myapplication.timesheet.presentation.DateFilter
+import com.example.myapplication.timesheet.presentation.getFilterName
 import kotlinx.coroutines.launch
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun DateBottomSheet(
-    selectedFilter: DateFilterType,
-    filterDateOptions: List<DateFilterType>,
-    onSelectedDate: (DateFilterType) -> Unit,
+    selectedFilter: DateFilter,
+    filterDateOptions: List<DateFilter>,
+    onSelectedDate: (DateFilter) -> Unit,
     onDismissBottomSheet: () -> Unit,
     onShowDatePickerRangeClicked: () -> Unit,
     onSearchToggled: () -> Unit = {}
 ) {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
+
     ModalBottomSheet(
         onDismissRequest = onDismissBottomSheet,
         sheetState = sheetState,
@@ -81,7 +83,7 @@ fun DateBottomSheet(
             }
 
             filterDateOptions.forEach { date ->
-                if (date != DateFilterType.CustomRange(null, null))
+                if (date !is DateFilter.CustomRange)
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         RadioButton(
                             selected = date == selectedFilter,
@@ -93,7 +95,7 @@ fun DateBottomSheet(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = getFilterName(date),
+                            text = date.getFilterName(),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -101,14 +103,3 @@ fun DateBottomSheet(
         }
     }
 }
-
-@Composable
-fun getFilterName(date: DateFilterType) =
-    when (date) {
-        DateFilterType.All -> stringResource(R.string.date_filter_all)
-        is DateFilterType.CustomRange -> "${date.startDate}..${date.endDate}"
-        DateFilterType.LastWeek -> stringResource(R.string.date_filter_last_week)
-        DateFilterType.ThisWeek -> stringResource(R.string.date_filter_this_week)
-        DateFilterType.Today -> stringResource(R.string.date_filter_today)
-        DateFilterType.Yesterday -> stringResource(R.string.date_filter_yesterday)
-    }

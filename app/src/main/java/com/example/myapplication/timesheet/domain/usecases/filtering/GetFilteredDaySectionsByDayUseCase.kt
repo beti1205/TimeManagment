@@ -1,88 +1,71 @@
 package com.example.myapplication.timesheet.domain.usecases.filtering
 
-import com.example.myapplication.timesheet.presentation.DateFilterType
-import com.example.myapplication.timesheet.presentation.DaySection
+import com.example.myapplication.timesheet.presentation.DateFilter
+import com.example.myapplication.timesheet.presentation.model.DaySection
 import com.example.myapplication.utils.formatToLongDate
 import java.time.DayOfWeek
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
-import javax.inject.Inject
 
 interface GetFilteredDaySectionsByDayUseCase {
     operator fun invoke(
-        selectedFilter: DateFilterType,
+        selectedFilter: DateFilter,
         daySections: List<DaySection>
     ): List<DaySection>
 }
 
-class GetFilteredDaySectionsByDayUseCaseImpl @Inject constructor() :
-    GetFilteredDaySectionsByDayUseCase {
+class GetFilteredDaySectionsByDayUseCaseImpl : GetFilteredDaySectionsByDayUseCase {
     override fun invoke(
-        selectedFilter: DateFilterType,
+        selectedFilter: DateFilter,
         daySections: List<DaySection>
     ): List<DaySection> {
         return when (selectedFilter) {
-            is DateFilterType.All -> daySections
-            is DateFilterType.Today -> daySections.filter { daySection ->
+            is DateFilter.All -> daySections
+            is DateFilter.Today -> daySections.filter { daySection ->
                 daySection.headerDate == Instant.now().formatToLongDate()
             }
 
-            is DateFilterType.Yesterday -> daySections.filter { daySection ->
+            is DateFilter.Yesterday -> daySections.filter { daySection ->
                 daySection.headerDate == (Instant.now().minus(Duration.ofDays(1))
                     .formatToLongDate())
             }
 
-            is DateFilterType.ThisWeek -> { daySections.filter { daySection ->
-                    dateContainsInWeek(daySection)
-                }
+            is DateFilter.ThisWeek -> daySections.filter { daySection ->
+                daySection.headerDate.isInWeek()
             }
 
-            is DateFilterType.LastWeek -> { daySections.filter { daySection ->
-                    dateContainsInWeek(daySection = daySection, lastWeek = true)
-                }
+            is DateFilter.LastWeek -> daySections.filter { daySection ->
+                daySection.headerDate.isInWeek(lastWeek = true)
             }
 
-            is DateFilterType.CustomRange -> daySections.filter { daySection ->
-                dateContainsInCustomRange(
-                    daySection = daySection,
-                    startDate = selectedFilter.startDate!!,
-                    endDate = selectedFilter.endDate!!
+            is DateFilter.CustomRange -> daySections.filter { daySection ->
+                daySection.headerDate.isInCustomRange(
+                    startDate = selectedFilter.startDate,
+                    endDate = selectedFilter.endDate
                 )
             }
         }
     }
 
-    private fun dateContainsInCustomRange(
-        daySection: DaySection,
+    private fun String.isInCustomRange(
         startDate: String,
         endDate: String
     ): Boolean {
-        val dateString = daySection.headerDate
-        val inputDate = LocalDate.parse(dateString)
+        val inputDate = LocalDate.parse(this)
         val startLocalDate = LocalDate.parse(startDate)
         val endLocalDate = LocalDate.parse(endDate)
+
         return inputDate in startLocalDate..endLocalDate
     }
 
-    private fun dateContainsInWeek(daySection: DaySection, lastWeek: Boolean = false): Boolean {
-        val dateString = daySection.headerDate
-        val inputDate = LocalDate.parse(dateString)
+    private fun String.isInWeek(lastWeek: Boolean = false): Boolean {
+        val inputDate = LocalDate.parse(this)
         val currentDate = LocalDate.now()
-        val startOfWeek = if (lastWeek) {
-            currentDate.minusWeeks(1).with(DayOfWeek.MONDAY)
-        } else {
-            currentDate.with(
-                DayOfWeek.MONDAY
-            )
-        }
-        val endOfWeek = if (lastWeek) {
-            currentDate.minusWeeks(1).with(DayOfWeek.SUNDAY)
-        } else {
-            currentDate.with(
-                DayOfWeek.SUNDAY
-            )
-        }
+        val weeksToSubtract: Long = if (lastWeek) 1 else 0
+        val startOfWeek = currentDate.minusWeeks(weeksToSubtract).with(DayOfWeek.MONDAY)
+        val endOfWeek = currentDate.minusWeeks(weeksToSubtract).with(DayOfWeek.SUNDAY)
+
         return inputDate in startOfWeek..endOfWeek
     }
 }

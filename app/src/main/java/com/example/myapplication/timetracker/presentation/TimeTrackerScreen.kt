@@ -122,7 +122,8 @@ fun TimeTrackerScreen(
             Button(
                 onClick = {
                     if (workingSubject.isNotBlank()) {
-                        focusManager.clearFocus(); onTimerToggled()
+                        focusManager.clearFocus()
+                        onTimerToggled()
                     } else {
                         onSubjectErrorChanged(true)
                     }

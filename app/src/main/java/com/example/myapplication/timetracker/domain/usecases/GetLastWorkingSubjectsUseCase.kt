@@ -2,15 +2,14 @@ package com.example.myapplication.timetracker.domain.usecases
 
 import com.example.myapplication.data.TimeTrackerRepository
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
 interface GetLastWorkingSubjectsUseCase {
     operator fun invoke(): Flow<String>
 }
 
-class GetLastWorkingSubjectsUseCaseImpl @Inject constructor(
+class GetLastWorkingSubjectsUseCaseImpl(
     private val repository: TimeTrackerRepository
-): GetLastWorkingSubjectsUseCase {
+) : GetLastWorkingSubjectsUseCase {
     override fun invoke(): Flow<String> {
         return repository.getLastWorkingSubject()
     }

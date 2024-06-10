@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
-import com.example.myapplication.timesheet.presentation.Time
+import com.example.myapplication.timesheet.presentation.model.Time
 import com.example.myapplication.utils.MaskVisualTransformation
 
 object TimeDefaults {
@@ -40,9 +40,7 @@ fun SetTimeTextField(
 
     val timeString by remember(time) {
         derivedStateOf {
-            time?.let {
-                "${it.hours}${it.minutes}${it.seconds}"
-            } ?: "000000"
+            time?.let { "${it.hours}${it.minutes}${it.seconds}" } ?: "000000"
         }
     }
 

@@ -41,7 +41,6 @@ class MainActivity : ComponentActivity() {
         super.attachBaseContext(newBase?.let { updateLocale(it, Locale.ENGLISH) })
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -77,14 +76,15 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             timeTracker.state.map { it.isActive }.distinctUntilChanged().collect { isActive ->
-                Intent(this@MainActivity, TimeTrackerService::class.java).also {
-                    if (isActive) {
-                        it.action = TimeTrackerService.Actions.START.toString()
-                    } else {
-                        it.action = TimeTrackerService.Actions.STOP.toString()
+                Intent(this@MainActivity, TimeTrackerService::class.java)
+                    .also { intent ->
+                        if (isActive) {
+                            intent.action = TimeTrackerService.Actions.START.toString()
+                        } else {
+                            intent.action = TimeTrackerService.Actions.STOP.toString()
+                        }
+                        startService(intent)
                     }
-                    startService(it)
-                }
             }
         }
     }
@@ -93,6 +93,7 @@ class MainActivity : ComponentActivity() {
         Locale.setDefault(locale)
         val configuration = Configuration(context.resources.configuration)
         configuration.setLocale(locale)
+
         return context.createConfigurationContext(configuration)
     }
 }

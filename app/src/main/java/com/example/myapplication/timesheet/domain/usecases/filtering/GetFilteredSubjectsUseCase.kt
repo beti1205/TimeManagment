@@ -1,7 +1,6 @@
 package com.example.myapplication.timesheet.domain.usecases.filtering
 
-import com.example.myapplication.timesheet.presentation.DaySection
-import javax.inject.Inject
+import com.example.myapplication.timesheet.presentation.model.DaySection
 
 interface GetFilteredSubjectsUseCase {
 
@@ -12,7 +11,7 @@ interface GetFilteredSubjectsUseCase {
     ): List<String>
 }
 
-class GetFilteredSubjectsUseCaseUseCaseImpl @Inject constructor() : GetFilteredSubjectsUseCase {
+class GetFilteredSubjectsUseCaseUseCaseImpl : GetFilteredSubjectsUseCase {
     override fun invoke(
         filteredDaySectionsByDay: List<DaySection>,
         isSearching: Boolean,

@@ -5,25 +5,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import com.example.myapplication.timesheet.presentation.DateFilterType
+import com.example.myapplication.timesheet.presentation.DateFilter
 
 @Composable
 fun DateFilter(
-    selectedFilter: DateFilterType,
-    filterDateOptions: List<DateFilterType>,
-    onSelectedFilterChanged: (DateFilterType) -> Unit,
+    selectedFilter: DateFilter,
+    filterDateOptions: List<DateFilter>,
+    onSelectedFilterChanged: (DateFilter) -> Unit,
     onSearchToggled: () -> Unit = {}
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
+    var showDateRangePicker by remember { mutableStateOf(false) }
 
-    var showDateRangePicker by remember {
-        mutableStateOf(false)
-    }
     if (showDateRangePicker) {
         DateRangePickerDialog(
             onDismiss = { showDateRangePicker = false },
             onSaveSelectedDate = { startDate, endDate ->
-                onSelectedFilterChanged(DateFilterType.CustomRange(startDate, endDate))
+                onSelectedFilterChanged(DateFilter.CustomRange(startDate, endDate))
                 showBottomSheet = false
                 onSearchToggled()
             }

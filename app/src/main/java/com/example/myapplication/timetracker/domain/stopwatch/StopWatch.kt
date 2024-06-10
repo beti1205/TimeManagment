@@ -1,6 +1,5 @@
 package com.example.myapplication.timetracker.domain.stopwatch
 
-import android.annotation.SuppressLint
 import com.example.myapplication.utils.formatToLongDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -81,27 +80,3 @@ class StopWatch @Inject constructor(private val scope: CoroutineScope) {
         }
     }
 }
-
-@SuppressLint("DefaultLocale")
-fun Time.formatTime(): String {
-    return String.format(
-        "%02d:%02d:%02d",
-        this.hours,
-        this.minutes,
-        this.seconds
-    )
-}
-
-fun Long.toTime(): Time {
-    val seconds = this % 60
-    val minutes = (this % 3600) / 60
-    val hours = this / 3600
-
-    return Time(hours, minutes, seconds)
-}
-
-data class Time(
-    val hours: Long,
-    val minutes: Long,
-    val seconds: Long
-)

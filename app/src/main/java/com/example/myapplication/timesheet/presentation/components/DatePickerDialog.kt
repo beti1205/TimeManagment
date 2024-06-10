@@ -13,7 +13,7 @@ import com.example.myapplication.utils.formatToDateWithoutDash
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun DatePickerDialogContent(
+fun DatePickerDialog(
     onDismissDatePickerDialog: () -> Unit,
     onDateChanged: (String) -> Unit
 ) {
@@ -31,12 +31,16 @@ fun DatePickerDialogContent(
                     }
                     onDismissDatePickerDialog()
                 }
-            ) { Text(stringResource(id = R.string.dialog_confirm_button)) }
+            ) {
+                Text(stringResource(id = R.string.dialog_confirm_button))
+            }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismissDatePickerDialog
-            ) { Text(stringResource(id = R.string.dialog_dismiss_button)) }
+            ) {
+                Text(stringResource(id = R.string.dialog_dismiss_button))
+            }
         }
     ) {
         DatePicker(state = datePickerState)

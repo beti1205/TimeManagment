@@ -25,7 +25,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
-import com.example.myapplication.timesheet.presentation.AddEditIntervalDialogState
+import com.example.myapplication.timesheet.presentation.model.AddEditIntervalDialogState
 import com.example.myapplication.utils.MaskVisualTransformation
 
 object DateDefaults {

@@ -7,7 +7,7 @@ interface DeleteTimeIntervalUseCase {
     suspend operator fun invoke(id: Int)
 }
 
-class DeleteTimeIntervalUseCaseImpl @Inject constructor(
+class DeleteTimeIntervalUseCaseImpl(
     private val repository: TimeTrackerRepository
 ) : DeleteTimeIntervalUseCase {
     override suspend fun invoke(id: Int) {

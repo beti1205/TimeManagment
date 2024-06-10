@@ -1,6 +1,5 @@
 package com.example.myapplication.timesheet.domain.usecases
 
-import com.example.myapplication.data.TimeTrackerEntity
 import com.example.myapplication.data.TimeTrackerRepository
 import javax.inject.Inject
 
@@ -10,11 +9,11 @@ interface UpdateTimeIntervalUseCase {
     )
 }
 
-class UpdateTimeIntervalUseCaseImpl @Inject constructor(
+class UpdateTimeIntervalUseCaseImpl(
     private val repository: TimeTrackerRepository
 ) : UpdateTimeIntervalUseCase {
     override suspend fun invoke(
-     timeIntervalParameters: TimeIntervalParameters
+        timeIntervalParameters: TimeIntervalParameters
     ) {
         return repository.updateTimeInterval(timeIntervalParameters.asTimeTrackerEntity())
     }

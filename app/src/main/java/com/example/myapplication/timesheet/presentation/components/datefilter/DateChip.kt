@@ -9,17 +9,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.timesheet.presentation.DateFilterType
+import com.example.myapplication.timesheet.presentation.DateFilter
+import com.example.myapplication.timesheet.presentation.getFilterName
 
 @Composable
 fun DateChip(
-    selectedFilter: DateFilterType,
+    selectedFilter: DateFilter,
     onShowBottomSheetClicked: () -> Unit
 ) {
     InputChip(
         selected = false,
         onClick = onShowBottomSheetClicked,
-        label = { Text(getFilterName(date = selectedFilter)) },
+        label = { Text(selectedFilter.getFilterName()) },
         trailingIcon = {
             Icon(
                 imageVector = Icons.Rounded.KeyboardArrowDown,
