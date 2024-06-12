@@ -12,4 +12,23 @@
     <string name="edit_dialog_cancel_button">Cancel</string>
     <string name="edit_dialog_start_time_text_field">Start time</string>
     <string name="edit_dialog_end_time_text_field">End time</string>
+    <string name="incorrect_time_was_entered">Incorrect time was entered</string>
+    <string name="date_filter_all">All</string>
+    <string name="date_filter_last_week">Last week</string>
+    <string name="date_filter_this_week">This week</string>
+    <string name="date_filter_today">Today</string>
+    <string name="date_filter_yesterday">Yesterday</string>
+    <string name="bottom_sheet_date_title">Date</string>
+    <string name="bottom_sheet_custom">Custom</string>
+    <string name="dialog_confirm_button">OK</string>
+    <string name="dialog_dismiss_button">Cancel</string>
+    <string name="edit_dialog_start_date_label">Start date</string>
+    <string name="edit_dialog_error_supporting_text">Incorrect date was entered</string>
+    <string name="search_bar_search_placeholder">Search</string>
+    <string name="add_dialog_header">Add time entity</string>
+    <string name="search_no_matches_info">No matches for this search</string>
+    <string name="snackbar_time_tracker_started">Time tracker started</string>
+    <string name="snackbar_action_reset">Reset</string>
+    <string name="empty_day_sections_message">Start stopwatch\nor\nadd your first time interval</string>
+    <string name="select_time">Select Time</string>
 </resources>

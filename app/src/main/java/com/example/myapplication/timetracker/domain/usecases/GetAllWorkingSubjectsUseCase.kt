@@ -8,9 +8,9 @@ interface GetAllWorkingSubjectsUseCase {
     operator fun invoke(): Flow<List<String>>
 }
 
-class GetAllWorkingSubjectsUseCaseImpl @Inject constructor(
+class GetAllWorkingSubjectsUseCaseImpl(
     private val repository: TimeTrackerRepository
-): GetAllWorkingSubjectsUseCase {
+) : GetAllWorkingSubjectsUseCase {
     override fun invoke(): Flow<List<String>> {
         return repository.getAllWorkingSubject()
     }

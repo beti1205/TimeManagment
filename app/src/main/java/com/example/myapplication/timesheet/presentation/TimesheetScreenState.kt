@@ -1,22 +1,17 @@
 package com.example.myapplication.timesheet.presentation
 
-import com.example.myapplication.timesheet.domain.usecases.DaySection
+import com.example.myapplication.timesheet.presentation.model.AddEditIntervalDialogState
+import com.example.myapplication.timesheet.presentation.model.DaySection
+import com.example.myapplication.timesheet.presentation.model.SearchBarState
 
 data class TimesheetScreenState(
     val daySections: List<DaySection> = emptyList(),
-    val isEditDialogVisible: Boolean = false,
-    val editIntervalDialogState: EditIntervalDialogState? = null
-)
-
-data class EditIntervalDialogState(
-    val id: Int,
-    val subject: String,
-    val startTime: String,
-    val endTime: String,
-    val date: String,
-    val isWrongStartTimeError: Boolean = false,
-    val isWrongEndTimeError: Boolean = false
+    val addEditIntervalDialogState: AddEditIntervalDialogState? = null,
+    val searchBarState: SearchBarState = SearchBarState(),
+    val subjects: List<String> = emptyList(),
+    val selectedFilter: DateFilter = DateFilter.All
 ) {
-    val isSaveEnabled: Boolean
-        get() = !isWrongStartTimeError && !isWrongEndTimeError
+    val isNotFindingResults = daySections.isEmpty() && (selectedFilter != DateFilter.All
+            || searchBarState.searchText.isNotBlank())
 }
+

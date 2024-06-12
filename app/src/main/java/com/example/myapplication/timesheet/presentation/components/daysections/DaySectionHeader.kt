@@ -1,4 +1,4 @@
-package com.example.myapplication.timesheet.presentation.components
+package com.example.myapplication.timesheet.presentation.components.daysections
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -19,11 +18,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.timesheet.domain.usecases.DaySection
-import com.example.myapplication.utils.changeDateFormat
+import com.example.myapplication.timesheet.presentation.model.DaySection
+import com.example.myapplication.utils.reformatDate
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 fun DaySectionHeader(
     daySection: DaySection,
     index: Int,
@@ -32,7 +30,7 @@ fun DaySectionHeader(
 ) {
     Spacer(modifier = Modifier.height(16.dp))
     ListItem(
-        headlineText = { Text(changeDateFormat(daySection.headerDate)) },
+        headlineContent = { Text(daySection.headerDate.reformatDate()) },
         shadowElevation = 2.dp,
         colors = ListItemDefaults.colors(
             containerColor = Color.LightGray

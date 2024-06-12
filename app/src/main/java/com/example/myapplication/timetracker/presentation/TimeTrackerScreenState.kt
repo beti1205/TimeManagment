@@ -8,7 +8,6 @@ data class TimeTrackerScreenState(
     val startTime: Instant? = null,
     val endTime: Instant? = null,
     val workingSubject: String = "",
-    val isTimeTrackingFinished: Boolean = false,
     val isSubjectErrorOccurred: Boolean = false,
     val filteredSubjectList: List<String> = emptyList()
 )

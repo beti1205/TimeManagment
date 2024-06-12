@@ -1,6 +1,5 @@
 package com.example.myapplication.timetracker.presentation
 
-import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,17 +27,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
-import com.example.myapplication.services.TimeTrackerService
-import com.example.myapplication.timetracker.domain.stopwatch.formatTime
-import com.example.myapplication.timetracker.domain.stopwatch.toTime
 import com.example.myapplication.timetracker.presentation.components.SubjectDropDown
+import com.example.myapplication.utils.convertSecondsToTimeString
 
 @Composable
 fun TimeTrackerScreen(
@@ -47,18 +43,6 @@ fun TimeTrackerScreen(
 ) {
 
     val state by viewModel.state.collectAsState()
-    val context = LocalContext.current
-
-    LaunchedEffect(key1 = state.isActive) {
-        Intent(context, TimeTrackerService::class.java).also {
-            if (state.isActive) {
-                it.action = TimeTrackerService.Actions.START.toString()
-            } else {
-                it.action = TimeTrackerService.Actions.STOP.toString()
-            }
-            context.startService(it)
-        }
-    }
 
     LaunchedEffect(key1 = state.workingSubject) {
         if (state.workingSubject.isNotBlank()) {
@@ -67,13 +51,13 @@ fun TimeTrackerScreen(
     }
 
     TimeTrackerScreen(
-        timeAmount = state.timeElapsed.toTime().formatTime(),
+        timeAmount = state.timeElapsed.convertSecondsToTimeString(),
         isActive = state.isActive,
         workingSubject = state.workingSubject,
         isSubjectErrorOccurred = state.isSubjectErrorOccurred,
         filteredSubjectList = state.filteredSubjectList,
-        onStart = viewModel::start,
-        onRestart = viewModel::restart,
+        onTimerToggled = viewModel::toggleTimer,
+        onResetClicked = viewModel::reset,
         onSubjectErrorChanged = viewModel::onSubjectErrorChanged,
         onWorkingSubjectChanged = viewModel::onWorkingSubjectChanged,
         onNavigateToTimeSheet = onNavigateToTimeSheet
@@ -87,8 +71,8 @@ fun TimeTrackerScreen(
     workingSubject: String,
     isSubjectErrorOccurred: Boolean,
     filteredSubjectList: List<String>,
-    onStart: () -> Unit = {},
-    onRestart: () -> Unit = {},
+    onTimerToggled: () -> Unit = {},
+    onResetClicked: () -> Unit = {},
     onSubjectErrorChanged: (Boolean) -> Unit = {},
     onWorkingSubjectChanged: (String) -> Unit = {},
     onNavigateToTimeSheet: () -> Unit
@@ -137,7 +121,8 @@ fun TimeTrackerScreen(
             Button(
                 onClick = {
                     if (workingSubject.isNotBlank()) {
-                        focusManager.clearFocus(); onStart()
+                        focusManager.clearFocus()
+                        onTimerToggled()
                     } else {
                         onSubjectErrorChanged(true)
                     }
@@ -152,7 +137,7 @@ fun TimeTrackerScreen(
                 }
             }
             Button(
-                onClick = onRestart,
+                onClick = onResetClicked,
                 shape = CircleShape,
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 7.dp)
             ) {

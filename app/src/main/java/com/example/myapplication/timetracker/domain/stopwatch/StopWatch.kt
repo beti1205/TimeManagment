@@ -18,41 +18,50 @@ class StopWatch @Inject constructor(private val scope: CoroutineScope) {
 
     private var counterJob: Job? = null
 
-    fun start() {
-        scope.launch {
-            if (state.value.isActive) {
-                counterJob?.cancel()
-                state.update {
-                    it.copy(
-                        isActive = false,
-                        isTimeTrackingFinished = true
-                    )
-                }
-            } else {
-                counterJob = launch { startCountingUp() }
-                state.update {
-                    it.copy(
-                        isActive = true,
-                        timeElapsed = 0L,
-                        isTimeTrackingFinished = false
-                    )
-                }
-            }
+    fun toggleTimer() {
+        if (state.value.isActive) {
+            stop()
+        } else {
+            start()
         }
     }
 
+    fun start() {
+        counterJob = scope.launch { startCountingUp() }
+        state.update {
+            it.copy(
+                isActive = true,
+                timeElapsed = 0L
+            )
+        }
+    }
+
+    fun stop() {
+        counterJob?.cancel()
+        state.update {
+            it.copy(
+                isActive = false
+            )
+        }
+    }
 
     fun reset() {
         if (state.value.isActive) {
             counterJob?.cancel()
         }
-        state.update { it.copy(isActive = false, timeElapsed = 0L, isTimeTrackingFinished = false) }
+        state.update { it.copy(isActive = false, timeElapsed = 0L) }
     }
 
     private suspend fun startCountingUp() {
         var startTime = Instant.now()
 
-        state.update { it.copy(startTime = startTime, date = startTime.formatToLongDate()) }
+        state.update {
+            it.copy(
+                startTime = startTime,
+                date = startTime.formatToLongDate(),
+                endTime = startTime
+            )
+        }
 
         while (true) {
             val timeAmount = Instant.now().epochSecond - startTime.epochSecond
@@ -70,26 +79,3 @@ class StopWatch @Inject constructor(private val scope: CoroutineScope) {
         }
     }
 }
-
-fun Time.formatTime(): String {
-    return String.format(
-        "%02d:%02d:%02d",
-        this.hours,
-        this.minutes,
-        this.seconds
-    )
-}
-
-fun Long.toTime(): Time {
-    val seconds = this % 60
-    val minutes = (this % 3600) / 60
-    val hours = this / 3600
-
-    return Time(hours, minutes, seconds)
-}
-
-data class Time(
-    val hours: Long,
-    val minutes: Long,
-    val seconds: Long
-)

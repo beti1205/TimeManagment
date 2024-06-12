@@ -1,19 +1,17 @@
 package com.example.myapplication.timesheet.domain.usecases
 
 import com.example.myapplication.data.TimeTrackerRepository
-import com.example.myapplication.timesheet.domain.model.TimeTrackerInterval
 import com.example.myapplication.timesheet.domain.model.toTimeTrackerInterval
-import com.example.myapplication.timetracker.domain.stopwatch.formatTime
-import com.example.myapplication.timetracker.domain.stopwatch.toTime
+import com.example.myapplication.timesheet.presentation.model.DaySection
+import com.example.myapplication.utils.convertSecondsToTimeString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
 interface GetTimeTrackerIntervalsUseCase {
     operator fun invoke(): Flow<List<DaySection>>
 }
 
-class GetTimeTrackerIntervalsUseCaseImpl @Inject constructor(
+class GetTimeTrackerIntervalsUseCaseImpl(
     private val repository: TimeTrackerRepository
 ) : GetTimeTrackerIntervalsUseCase {
     override fun invoke(): Flow<List<DaySection>> {
@@ -21,7 +19,9 @@ class GetTimeTrackerIntervalsUseCaseImpl @Inject constructor(
             entities.map { it.toTimeTrackerInterval() }
                 .groupBy { it.date }
                 .map { group ->
-                    val timeAmount = group.value.sumOf { it.timeElapsed }.toTime().formatTime()
+                    val timeAmount = group.value.sumOf {
+                        it.timeElapsed
+                    }.convertSecondsToTimeString()
                     DaySection(
                         headerDate = group.key,
                         headerTimeAmount = timeAmount,
@@ -31,9 +31,3 @@ class GetTimeTrackerIntervalsUseCaseImpl @Inject constructor(
         }
     }
 }
-
-data class DaySection(
-    val headerDate: String,
-    val headerTimeAmount: String,
-    val timeIntervals: List<TimeTrackerInterval>
-)

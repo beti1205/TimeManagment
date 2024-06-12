@@ -13,10 +13,9 @@ import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.R
 import com.example.myapplication.timetracker.domain.timetracker.TimeTracker
 import com.example.myapplication.timetracker.domain.timetracker.TimeTrackerState
-import com.example.myapplication.timetracker.domain.stopwatch.formatTime
-import com.example.myapplication.timetracker.domain.stopwatch.toTime
 import com.example.myapplication.timetracker.domain.usecases.GetLastWorkingSubjectsUseCase
 import com.example.myapplication.ui.MainActivity
+import com.example.myapplication.utils.convertSecondsToTimeString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
@@ -43,7 +42,7 @@ class TimeTrackerService : LifecycleService() {
             Actions.START.toString() -> start()
             Actions.STOP.toString() -> stopSelf()
             Actions.RESET.toString() -> timeTracker.reset()
-            Actions.PAUSE.toString() -> timeTracker.start()
+            Actions.PAUSE.toString() -> timeTracker.toggleTimer()
 
         }
         return super.onStartCommand(intent, flags, startId)
@@ -77,7 +76,8 @@ class TimeTrackerService : LifecycleService() {
         val pendingIntent = createPausePendingIntent()
         val resetPendingIntent = createResetPendingIntent()
 
-        val notification = notificationBuilder.setContentText(state.timeElapsed.toTime().formatTime())
+        val notification = notificationBuilder
+            .setContentText(state.timeElapsed.convertSecondsToTimeString())
             .setContentTitle(state.workingSubject)
             .clearActions()
             .addAction(
