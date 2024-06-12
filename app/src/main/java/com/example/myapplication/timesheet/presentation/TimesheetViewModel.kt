@@ -3,16 +3,17 @@ package com.example.myapplication.timesheet.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.timesheet.domain.usecases.AddTimeIntervalUseCase
-import com.example.myapplication.timesheet.domain.usecases.validators.ValidateDate
 import com.example.myapplication.timesheet.domain.usecases.DeleteTimeIntervalUseCase
+import com.example.myapplication.timesheet.domain.usecases.GetTimeTrackerIntervalsUseCase
+import com.example.myapplication.timesheet.domain.usecases.TimeIntervalParameters
+import com.example.myapplication.timesheet.domain.usecases.UpdateTimeIntervalUseCase
 import com.example.myapplication.timesheet.domain.usecases.filtering.GetFilteredDaySectionsByDayUseCase
 import com.example.myapplication.timesheet.domain.usecases.filtering.GetFilteredDaySectionsUseCase
 import com.example.myapplication.timesheet.domain.usecases.filtering.GetFilteredSubjectsUseCase
-import com.example.myapplication.timesheet.domain.usecases.GetTimeTrackerIntervalsUseCase
-import com.example.myapplication.timesheet.domain.usecases.TimeIntervalParameters
+import com.example.myapplication.timesheet.domain.usecases.validators.ValidateDate
 import com.example.myapplication.timesheet.domain.usecases.validators.ValidateTime
-import com.example.myapplication.timesheet.domain.usecases.UpdateTimeIntervalUseCase
 import com.example.myapplication.timesheet.presentation.model.AddEditIntervalDialogState
+import com.example.myapplication.timesheet.presentation.model.FilteredDaySectionWithSubject
 import com.example.myapplication.timesheet.presentation.model.SearchBarState
 import com.example.myapplication.timesheet.presentation.model.formatToInstantWithAdditionalDay
 import com.example.myapplication.timesheet.presentation.model.toInstant
@@ -59,35 +60,49 @@ class TimesheetViewModel @Inject constructor(
     private val searchBarState: MutableStateFlow<SearchBarState> =
         MutableStateFlow(SearchBarState())
 
-    private val selectedFilter: MutableStateFlow<DateFilter> =
-        MutableStateFlow(DateFilter.All)
+    private val selectedFilter: MutableStateFlow<DateFilter> = MutableStateFlow(DateFilter.All)
 
-    val state: StateFlow<TimesheetScreenState> = combine(
+    private val filteredDaySectionsByDay = selectedFilter.combine(
         getTimeTrackerIntervalsUseCase(),
-        addEditIntervalDialogState,
-        searchBarState,
-        selectedFilter
-    ) { daySections, editIntervalDialogState, searchBar, selectedFilter ->
-
-        val searchText = searchBar.searchText
-        val filteredDaySectionsByDay = getFilteredDaySectionsByDayUseCase(
+    ) { selectedFilter, daySections ->
+        getFilteredDaySectionsByDayUseCase(
             selectedFilter = selectedFilter,
             daySections = daySections
         )
+    }
 
-        val subjects = getFilteredSubjectsUseCase(
-            filteredDaySectionsByDay = filteredDaySectionsByDay,
-            isSearching = searchBar.isSearching,
-            searchText = searchText
-        )
+    private val filteredDaySectionsWithSubjects = filteredDaySectionsByDay
+        .combine(searchBarState) { filteredDaySectionsByDay, searchBar ->
+            val searchText = searchBar.searchText
 
-        val filteredDaySections = getFilteredDaySectionsUseCase(
-            searchText = searchText,
-            isSearching = !searchBar.isSearching,
-            filteredDaySectionsByDay = filteredDaySectionsByDay
-        )
+            val subjects = getFilteredSubjectsUseCase(
+                filteredDaySectionsByDay = filteredDaySectionsByDay,
+                isSearching = searchBar.isSearching,
+                searchText = searchText
+            )
+            val filteredDaySections = getFilteredDaySectionsUseCase(
+                searchText = searchText,
+                isSearching = !searchBar.isSearching,
+                filteredDaySectionsByDay = filteredDaySectionsByDay
+            )
 
+            FilteredDaySectionWithSubject(
+                filteredDaySections = filteredDaySections,
+                subjects = subjects
+            )
+        }
+
+    val state: StateFlow<TimesheetScreenState> = combine(
+        filteredDaySectionsWithSubjects,
+        addEditIntervalDialogState,
+        searchBarState,
+        selectedFilter
+    ) { filteredDaySectionsWithSubjects, editIntervalDialogState, searchBar, selectedFilter ->
+
+        val filteredDaySections = filteredDaySectionsWithSubjects.filteredDaySections
         val daySectionsSortedByDates = filteredDaySections.sortedByDescending { it.headerDate }
+
+        val subjects = filteredDaySectionsWithSubjects.subjects
 
         TimesheetScreenState(
             daySections = daySectionsSortedByDates,
