@@ -59,3 +59,11 @@ fun Time.toInstant(date: String): Instant {
 
     return ldt.atZone(ZoneId.systemDefault()).toInstant()
 }
+
+fun Time.formatToInstantWithAdditionalDay(date: String): Instant {
+    val timeString = "${this.hours}:${this.minutes}:${this.seconds}"
+    val strDateTime = date + "T" + timeString
+    val ldt = LocalDateTime.parse(strDateTime).plusDays(1)
+
+    return ldt.atZone(ZoneId.systemDefault()).toInstant()
+}

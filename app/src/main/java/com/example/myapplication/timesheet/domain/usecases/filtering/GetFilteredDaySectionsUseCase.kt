@@ -1,8 +1,7 @@
 package com.example.myapplication.timesheet.domain.usecases.filtering
 
 import com.example.myapplication.timesheet.presentation.model.DaySection
-import com.example.myapplication.timetracker.domain.stopwatch.formatTime
-import com.example.myapplication.timetracker.domain.stopwatch.toTime
+import com.example.myapplication.utils.convertSecondsToTimeString
 
 interface GetFilteredDaySectionsUseCase {
 
@@ -36,8 +35,9 @@ class GetFilteredDaySectionsUseCaseImpl : GetFilteredDaySectionsUseCase {
         return if (matchingIntervals.isNotEmpty()) {
             DaySection(
                 headerDate = this.headerDate,
-                headerTimeAmount = matchingIntervals.sumOf { it.timeElapsed }.toTime()
-                    .formatTime(),
+                headerTimeAmount = matchingIntervals.sumOf {
+                    it.timeElapsed
+                }.convertSecondsToTimeString(),
                 timeIntervals = matchingIntervals
             )
         } else {

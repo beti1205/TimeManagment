@@ -14,12 +14,12 @@ import com.example.myapplication.timesheet.domain.usecases.validators.ValidateTi
 import com.example.myapplication.timesheet.domain.usecases.UpdateTimeIntervalUseCase
 import com.example.myapplication.timesheet.presentation.model.AddEditIntervalDialogState
 import com.example.myapplication.timesheet.presentation.model.SearchBarState
+import com.example.myapplication.timesheet.presentation.model.formatToInstantWithAdditionalDay
 import com.example.myapplication.timesheet.presentation.model.toInstant
 import com.example.myapplication.timesheet.presentation.model.toTime
 import com.example.myapplication.timetracker.domain.timetracker.TimeTracker
 import com.example.myapplication.utils.formatDateWithDash
 import com.example.myapplication.utils.formatToDateWithoutDash
-import com.example.myapplication.utils.formatToInstantWithAdditionalDay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -236,13 +236,14 @@ class TimesheetViewModel @Inject constructor(
 
             endTime = when {
                 difference > 0 -> {
-                    formatToInstantWithAdditionalDay(
-                        state.date,
-                        stateEndTime
+                    stateEndTime.formatToInstantWithAdditionalDay(
+                        state.date
                     )
                 }
 
-                else -> { stateEndTime.toInstant(state.date) }
+                else -> {
+                    stateEndTime.toInstant(state.date)
+                }
             }
         }
 

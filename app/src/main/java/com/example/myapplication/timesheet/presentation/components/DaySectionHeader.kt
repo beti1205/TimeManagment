@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.timesheet.presentation.model.DaySection
-import com.example.myapplication.utils.changeDateFormat
+import com.example.myapplication.utils.reformatDate
 
 @Composable
 fun DaySectionHeader(
@@ -30,7 +30,7 @@ fun DaySectionHeader(
 ) {
     Spacer(modifier = Modifier.height(16.dp))
     ListItem(
-        headlineContent = { Text(changeDateFormat(daySection.headerDate)) },
+        headlineContent = { Text(daySection.headerDate.reformatDate()) },
         shadowElevation = 2.dp,
         colors = ListItemDefaults.colors(
             containerColor = Color.LightGray

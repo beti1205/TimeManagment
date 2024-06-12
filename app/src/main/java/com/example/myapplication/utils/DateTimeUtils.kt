@@ -1,9 +1,7 @@
 package com.example.myapplication.utils
 
-import com.example.myapplication.timesheet.presentation.model.Time
 import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -46,18 +44,10 @@ fun Long.formatToLongDate(): String {
     return date.formatToLongDate()
 }
 
-fun formatToInstantWithAdditionalDay(date: String, time: Time): Instant {
-    val timeString = "${time.hours}:${time.minutes}:${time.seconds}"
-    val strDateTime = date + "T" + timeString
-    val ldt = LocalDateTime.parse(strDateTime).plusDays(1)
-
-    return ldt.atZone(ZoneId.systemDefault()).toInstant()
-}
-
-fun changeDateFormat(date: String): String {
+fun String.reformatDate(): String {
     val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     val outputFormatter = DateTimeFormatter.ofPattern("E, MMM d", Locale.ENGLISH)
-    val date = LocalDate.parse(date, inputFormatter)
+    val date = LocalDate.parse(this, inputFormatter)
 
     return date.format(outputFormatter)
 }
@@ -72,10 +62,18 @@ fun String.formatDateWithDash(): String {
     return "$year-$month-$day"
 }
 
-fun getDaysBetween(start: Instant, end: Instant): String {
+fun calculateDaysBetween(start: Instant, end: Instant): String {
     val startDate = start.atZone(ZoneId.systemDefault()).toLocalDate()
     val endDate = end.atZone(ZoneId.systemDefault()).toLocalDate()
     val days = endDate.toEpochDay() - startDate.toEpochDay()
 
     return days.toString()
+}
+
+fun Long.convertSecondsToTimeString(): String {
+    val hours = this / 3600
+    val minutes = (this % 3600) / 60
+    val seconds = this % 60
+
+    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
 }

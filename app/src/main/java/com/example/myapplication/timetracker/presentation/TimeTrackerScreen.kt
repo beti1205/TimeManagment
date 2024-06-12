@@ -33,9 +33,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.R
-import com.example.myapplication.timetracker.domain.stopwatch.formatTime
-import com.example.myapplication.timetracker.domain.stopwatch.toTime
 import com.example.myapplication.timetracker.presentation.components.SubjectDropDown
+import com.example.myapplication.utils.convertSecondsToTimeString
 
 @Composable
 fun TimeTrackerScreen(
@@ -52,7 +51,7 @@ fun TimeTrackerScreen(
     }
 
     TimeTrackerScreen(
-        timeAmount = state.timeElapsed.toTime().formatTime(),
+        timeAmount = state.timeElapsed.convertSecondsToTimeString(),
         isActive = state.isActive,
         workingSubject = state.workingSubject,
         isSubjectErrorOccurred = state.isSubjectErrorOccurred,

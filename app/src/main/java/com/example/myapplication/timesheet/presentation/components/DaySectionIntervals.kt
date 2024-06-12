@@ -38,8 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 import com.example.myapplication.timesheet.domain.model.TimeTrackerInterval
-import com.example.myapplication.timetracker.domain.stopwatch.formatTime
-import com.example.myapplication.timetracker.domain.stopwatch.toTime
+import com.example.myapplication.utils.convertSecondsToTimeString
 import com.example.myapplication.utils.formatToTimeStr
 import kotlinx.coroutines.launch
 
@@ -100,7 +99,7 @@ fun DaySectionIntervals(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = timeInterval.timeElapsed.toTime().formatTime()
+                        text = timeInterval.timeElapsed.convertSecondsToTimeString()
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     IconButton(onClick = { onTimeTrackerStarted(timeInterval.workingSubject) }) {
@@ -157,4 +156,3 @@ fun DaySectionIntervals(
         Spacer(modifier = Modifier.height(8.dp))
     }
 }
-

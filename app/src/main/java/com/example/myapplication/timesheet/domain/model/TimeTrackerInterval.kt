@@ -1,7 +1,7 @@
 package com.example.myapplication.timesheet.domain.model
 
 import com.example.myapplication.data.TimeTrackerEntity
-import com.example.myapplication.utils.getDaysBetween
+import com.example.myapplication.utils.calculateDaysBetween
 import java.time.Instant
 
 data class TimeTrackerInterval(
@@ -22,6 +22,6 @@ fun TimeTrackerEntity.toTimeTrackerInterval(): TimeTrackerInterval{
         endTime = endTime,
         workingSubject = workingSubject,
         date = date,
-        additionalDays = getDaysBetween(startTime, endTime)
+        additionalDays = calculateDaysBetween(startTime, endTime)
     )
 }
