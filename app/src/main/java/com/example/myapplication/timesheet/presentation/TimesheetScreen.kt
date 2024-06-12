@@ -15,16 +15,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.timesheet.domain.model.TimeTrackerInterval
-import com.example.myapplication.timesheet.presentation.components.AddEditTimeIntervalDialog
-import com.example.myapplication.timesheet.presentation.components.DatePickerDialog
+import com.example.myapplication.timesheet.presentation.components.addeditdialog.AddEditTimeIntervalDialog
+import com.example.myapplication.timesheet.presentation.components.addeditdialog.DatePickerDialog
 import com.example.myapplication.timesheet.presentation.components.DeleteDialog
 import com.example.myapplication.timesheet.presentation.components.EmptyStateScreen
 import com.example.myapplication.timesheet.presentation.components.NoSearchResultsScreen
 import com.example.myapplication.timesheet.presentation.components.ScaffoldFloatingActionButton
 import com.example.myapplication.timesheet.presentation.components.SearchBar
-import com.example.myapplication.timesheet.presentation.components.TimeIntervalList
-import com.example.myapplication.timesheet.presentation.components.TimePickerDialog
-import com.example.myapplication.timesheet.presentation.components.addEditIntervalDialogHeader
+import com.example.myapplication.timesheet.presentation.components.daysections.DaySectionList
+import com.example.myapplication.timesheet.presentation.components.addeditdialog.TimePickerDialog
+import com.example.myapplication.timesheet.presentation.components.addeditdialog.addEditIntervalDialogHeader
 import com.example.myapplication.timesheet.presentation.components.datefilter.DateFilter
 import com.example.myapplication.timesheet.presentation.model.AddEditIntervalDialogState
 import com.example.myapplication.timesheet.presentation.model.DaySection
@@ -156,7 +156,7 @@ fun TimesheetScreen(
             }
             when {
                 state.daySections.isNotEmpty() -> {
-                    TimeIntervalList(
+                    DaySectionList(
                         daySections = state.daySections,
                         snackbarHostState = snackbarHostState,
                         onEditClicked = onEditClicked,

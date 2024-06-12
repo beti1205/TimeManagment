@@ -45,7 +45,6 @@ class StopWatch @Inject constructor(private val scope: CoroutineScope) {
         }
     }
 
-
     fun reset() {
         if (state.value.isActive) {
             counterJob?.cancel()

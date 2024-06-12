@@ -1,4 +1,4 @@
-package com.example.myapplication.timesheet.presentation.components
+package com.example.myapplication.timesheet.presentation.components.addeditdialog
 
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog

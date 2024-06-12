@@ -1,4 +1,4 @@
-package com.example.myapplication.timesheet.presentation.components
+package com.example.myapplication.timesheet.presentation.components.addeditdialog
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource

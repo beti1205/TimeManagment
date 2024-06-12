@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.DateRangePicker
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -18,7 +19,7 @@ fun DateRangePicker(
 ) {
     val dateFormatter = remember { DatePickerDefaults.dateFormatter() }
 
-    androidx.compose.material3.DateRangePicker(
+    DateRangePicker(
         dateFormatter = dateFormatter,
         state = dateRangePickerState,
         modifier = modifier,

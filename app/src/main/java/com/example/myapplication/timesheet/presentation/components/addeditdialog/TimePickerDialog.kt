@@ -1,4 +1,4 @@
-package com.example.myapplication.timesheet.presentation.components
+package com.example.myapplication.timesheet.presentation.components.addeditdialog
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background

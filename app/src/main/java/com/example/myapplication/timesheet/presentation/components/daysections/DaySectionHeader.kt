@@ -1,4 +1,4 @@
-package com.example.myapplication.timesheet.presentation.components
+package com.example.myapplication.timesheet.presentation.components.daysections
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

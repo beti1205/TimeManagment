@@ -1,4 +1,4 @@
-package com.example.myapplication.timesheet.presentation.components
+package com.example.myapplication.timesheet.presentation.components.daysections
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,7 +18,7 @@ import com.example.myapplication.timesheet.presentation.model.DaySection
 import kotlinx.coroutines.launch
 
 @Composable
-fun TimeIntervalList(
+fun DaySectionList(
     daySections: List<DaySection>,
     snackbarHostState: SnackbarHostState,
     onEditClicked: (Int) -> Unit,
@@ -29,7 +29,7 @@ fun TimeIntervalList(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    TimeIntervalList(
+    DaySectionList(
         daySections = daySections,
         onDeleteClicked = onDeleteClicked,
         onEditClicked = onEditClicked,
@@ -55,7 +55,7 @@ fun TimeIntervalList(
 }
 
 @Composable
-fun TimeIntervalList(
+fun DaySectionList(
     daySections: List<DaySection>,
     onDeleteClicked: (Int) -> Unit,
     onEditClicked: (Int) -> Unit,
