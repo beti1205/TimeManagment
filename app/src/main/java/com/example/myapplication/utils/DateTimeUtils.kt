@@ -1,14 +1,22 @@
 package com.example.myapplication.utils
 
+import android.annotation.SuppressLint
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 fun Instant.formatToTimeStr(): String {
     val formatter = DateTimeFormatter
         .ofPattern("HH:mm")
+        .withZone(ZoneId.systemDefault())
+
+    return formatter.format(this)
+}
+
+fun Instant.formatToLongTimeStr(): String {
+    val formatter = DateTimeFormatter
+        .ofPattern("HH:mm:ss")
         .withZone(ZoneId.systemDefault())
 
     return formatter.format(this)
@@ -24,6 +32,14 @@ fun String.formatToDateWithoutDash(): String {
 fun Instant.formatToLongDate(): String {
     val formatter = DateTimeFormatter
         .ofPattern("yyyy-MM-dd")
+        .withZone(ZoneId.systemDefault())
+
+    return formatter.format(this)
+}
+
+fun Instant.formatToDayMonthDate(): String {
+    val formatter = DateTimeFormatter
+        .ofPattern("E, MMM d")
         .withZone(ZoneId.systemDefault())
 
     return formatter.format(this)
@@ -46,7 +62,7 @@ fun Long.formatToLongDate(): String {
 
 fun String.reformatDate(): String {
     val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    val outputFormatter = DateTimeFormatter.ofPattern("E, MMM d", Locale.ENGLISH)
+    val outputFormatter = DateTimeFormatter.ofPattern("E, MMM d")
     val date = LocalDate.parse(this, inputFormatter)
 
     return date.format(outputFormatter)
@@ -70,6 +86,7 @@ fun calculateDaysBetween(start: Instant, end: Instant): String {
     return days.toString()
 }
 
+@SuppressLint("DefaultLocale")
 fun Long.convertSecondsToTimeString(): String {
     val hours = this / 3600
     val minutes = (this % 3600) / 60

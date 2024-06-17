@@ -49,7 +49,14 @@ class StopWatch @Inject constructor(private val scope: CoroutineScope) {
         if (state.value.isActive) {
             counterJob?.cancel()
         }
-        state.update { it.copy(isActive = false, timeElapsed = 0L) }
+        state.update {
+            it.copy(
+                isActive = false,
+                timeElapsed = 0L,
+                startTime = null,
+                endTime = null
+            )
+        }
     }
 
     private suspend fun startCountingUp() {

@@ -10,4 +10,6 @@ data class TimeTrackerScreenState(
     val workingSubject: String = "",
     val isSubjectErrorOccurred: Boolean = false,
     val filteredSubjectList: List<String> = emptyList()
-)
+){
+    val showEndTime = endTime != null && !isActive
+}

@@ -1,5 +1,6 @@
 package com.example.myapplication.timetracker.presentation.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -32,21 +33,22 @@ fun SubjectDropDown(
     isSubjectChangeEnabled: Boolean,
     isSubjectErrorOccurred: Boolean,
     filteredSubjectList: List<String>,
-    onWorkingSubjectChanged: (String) -> Unit = {},
-    clearFocus: () -> Unit
+    modifier: Modifier = Modifier,
+    clearFocus: () -> Unit,
+    onWorkingSubjectChanged: (String) -> Unit = {}
 ) {
 
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
-        modifier = Modifier.padding(horizontal = 64.dp),
+        modifier = modifier,
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
     ) {
         OutlinedTextField(
             modifier = Modifier
-                .menuAnchor()
-                .offset(y = (-32).dp),
+                .fillMaxWidth()
+                .menuAnchor(),
             textStyle = TextStyle.Default.copy(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Light
