@@ -9,7 +9,9 @@ data class TimeTrackerScreenState(
     val endTime: Instant? = null,
     val workingSubject: String = "",
     val isSubjectErrorOccurred: Boolean = false,
-    val filteredSubjectList: List<String> = emptyList()
-){
+    val filteredSubjectList: List<String> = emptyList(),
+    val selectedChangesType: TimeAmountChangesType? = null
+) {
     val showEndTime = endTime != null && !isActive
+    val chipsEnabled = isActive || (timeElapsed == 0L && endTime == null)
 }

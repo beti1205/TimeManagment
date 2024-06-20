@@ -33,12 +33,16 @@ class TimeTrackerViewModel @Inject constructor(
     private val subjects: StateFlow<List<String>> = getAllWorkingSubjectsUseCase()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
+    private val selectedChangesType: MutableStateFlow<TimeAmountChangesType?> =
+        MutableStateFlow(null)
+
     val state: StateFlow<TimeTrackerScreenState> = combine(
         timeTrackerState,
         subjects,
         isSubjectErrorOccurred,
-        workingSubject
-    ) { timeTrackerState, subjects, isSubjectError, workingSubject ->
+        workingSubject,
+        selectedChangesType
+    ) { timeTrackerState, subjects, isSubjectError, workingSubject, type ->
         val filteredSubjects = subjects
             .distinct()
             .filter { it.contains(workingSubject, true) }
@@ -50,7 +54,8 @@ class TimeTrackerViewModel @Inject constructor(
             endTime = timeTrackerState.endTime,
             workingSubject = workingSubject,
             isSubjectErrorOccurred = isSubjectError,
-            filteredSubjectList = filteredSubjects
+            filteredSubjectList = filteredSubjects,
+            selectedChangesType = type
         )
 
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), TimeTrackerScreenState())
@@ -66,10 +71,29 @@ class TimeTrackerViewModel @Inject constructor(
     }
 
     fun toggleTimer() {
+        handleSelectedChangesType()
+
         timeTracker.toggleTimer()
     }
 
+    private fun handleSelectedChangesType() {
+        clearPreviouslySelectedTypeBeforeStarted()
+        correctEndTimeWhenStopped()
+    }
+
+    private fun clearPreviouslySelectedTypeBeforeStarted() {
+        val endTime = state.value.endTime
+        val isActive = state.value.isActive
+
+        if (!isActive && selectedChangesType.value != null && endTime != null) {
+            clearSelectedType()
+        }
+    }
+
     fun reset() {
+        if (selectedChangesType.value != null) {
+            clearSelectedType()
+        }
         timeTracker.reset()
     }
 
@@ -84,4 +108,32 @@ class TimeTrackerViewModel @Inject constructor(
     fun onSubjectErrorChanged(isSubjectErrorOccurred: Boolean) {
         this.isSubjectErrorOccurred.update { isSubjectErrorOccurred }
     }
+
+    fun onTypeSelected(type: TimeAmountChangesType) {
+        if (type == selectedChangesType.value) {
+            clearSelectedType()
+        } else {
+            this.selectedChangesType.update { type }
+        }
+    }
+
+    private fun clearSelectedType() {
+        this.selectedChangesType.update { null }
+    }
+
+    private fun correctEndTimeWhenStopped() {
+        if (selectedChangesType.value == null || !state.value.isActive) return
+
+        val amountToChange = selectedChangesType.value!!.amount
+        timeTracker.adjustTime(amountToChange)
+    }
+}
+
+enum class TimeAmountChangesType(val amount: Int) {
+    REDUCED_30(-30),
+    REDUCED_15(-15),
+    REDUCED_5(-5),
+    INCREASED_5(5),
+    INCREASED_15(15),
+    INCREASED_30(30)
 }

@@ -38,7 +38,7 @@ import com.example.myapplication.R
 import com.example.myapplication.timetracker.presentation.components.SubjectDropDown
 import com.example.myapplication.utils.convertSecondsToTimeString
 import com.example.myapplication.utils.formatToLongTimeStr
-import com.example.myapplication.utils.formatToNiceDate
+import com.example.myapplication.utils.formatToDayMonthDate
 import java.time.Instant
 
 @Composable
@@ -62,13 +62,16 @@ fun TimeTrackerScreen(
         startTime = state.startTime,
         endTime = state.endTime,
         workingSubject = state.workingSubject,
+        chipsEnabled = state.chipsEnabled,
         isSubjectErrorOccurred = state.isSubjectErrorOccurred,
+        selectedChangesType = state.selectedChangesType,
         filteredSubjectList = state.filteredSubjectList,
         onTimerToggled = viewModel::toggleTimer,
         onResetClicked = viewModel::reset,
         onSubjectErrorChanged = viewModel::onSubjectErrorChanged,
         onWorkingSubjectChanged = viewModel::onWorkingSubjectChanged,
-        onNavigateToTimeSheet = onNavigateToTimeSheet
+        onNavigateToTimeSheet = onNavigateToTimeSheet,
+        onTypeSelected = viewModel::onTypeSelected
     )
 }
 
@@ -80,13 +83,16 @@ fun TimeTrackerScreen(
     startTime: Instant?,
     endTime: Instant?,
     workingSubject: String,
+    chipsEnabled: Boolean,
     isSubjectErrorOccurred: Boolean,
+    selectedChangesType: TimeAmountChangesType?,
     filteredSubjectList: List<String>,
     onTimerToggled: () -> Unit = {},
     onResetClicked: () -> Unit = {},
     onSubjectErrorChanged: (Boolean) -> Unit = {},
     onWorkingSubjectChanged: (String) -> Unit = {},
-    onNavigateToTimeSheet: () -> Unit
+    onNavigateToTimeSheet: () -> Unit,
+    onTypeSelected: (TimeAmountChangesType) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -100,7 +106,7 @@ fun TimeTrackerScreen(
             )
             Text(text = startTime?.formatToLongTimeStr() ?: stringResource(R.string.emptyTime))
             Text(
-                text = Instant.now().formatToNiceDate(),
+                text = Instant.now().formatToDayMonthDate(),
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.End
@@ -152,18 +158,22 @@ fun TimeTrackerScreen(
                 .padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val chipList = listOf("-30", "-15", "-5", "+5", "+15", "+30")
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                chipList.forEach { chip ->
+                TimeAmountChangesType.entries.forEach { chip ->
                     FilterChip(
-                        label = { Text(chip) },
-                        selected = false,
-                        onClick = {}
+                        label = {
+                            Text(
+                                getTypeName(chip)
+                            )
+                        },
+                        selected = selectedChangesType == chip,
+                        onClick = { onTypeSelected(chip) },
+                        enabled = chipsEnabled
                     )
                 }
             }
@@ -217,3 +227,14 @@ fun TimeTrackerScreen(
         }
     }
 }
+
+@Composable
+private fun getTypeName(chip: TimeAmountChangesType) =
+    when (chip) {
+        TimeAmountChangesType.INCREASED_5 -> stringResource(R.string.increased_5)
+        TimeAmountChangesType.INCREASED_15 -> stringResource(R.string.increased_15)
+        TimeAmountChangesType.INCREASED_30 -> stringResource(R.string.increased_30)
+        TimeAmountChangesType.REDUCED_5 -> stringResource(R.string.reduced_5)
+        TimeAmountChangesType.REDUCED_15 -> stringResource(R.string.reduced_15)
+        TimeAmountChangesType.REDUCED_30 -> stringResource(R.string.reduced_30)
+    }

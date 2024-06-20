@@ -34,4 +34,10 @@
     <string name="time_tracker_start_time">"Start time: "</string>
     <string name="time_tracker_end_time">"End time: "</string>
     <string name="emptyTime">--:--:--</string>
+    <string name="increased_5">+5</string>
+    <string name="increased_15">+15</string>
+    <string name="increased_30">+30</string>
+    <string name="reduced_5">-5</string>
+    <string name="reduced_15">-15</string>
+    <string name="reduced_30">-30</string>
 </resources>
