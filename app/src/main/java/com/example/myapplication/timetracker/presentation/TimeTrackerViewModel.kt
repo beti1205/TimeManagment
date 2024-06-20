@@ -43,9 +43,11 @@ class TimeTrackerViewModel @Inject constructor(
         workingSubject,
         selectedChangesType
     ) { timeTrackerState, subjects, isSubjectError, workingSubject, type ->
-        val filteredSubjects = subjects
-            .distinct()
-            .filter { it.contains(workingSubject, true) }
+        val filteredSubjects = getFilteredSubject(
+            subjects = subjects,
+            workingSubject = workingSubject,
+            isActive = timeTrackerState.isActive
+        )
 
         TimeTrackerScreenState(
             isActive = timeTrackerState.isActive,
@@ -54,7 +56,7 @@ class TimeTrackerViewModel @Inject constructor(
             endTime = timeTrackerState.endTime,
             workingSubject = workingSubject,
             isSubjectErrorOccurred = isSubjectError,
-            filteredSubjectList = filteredSubjects,
+            filteredSubjects = filteredSubjects,
             selectedChangesType = type
         )
 
@@ -67,6 +69,23 @@ class TimeTrackerViewModel @Inject constructor(
                 .collectLatest { workingSubject ->
                     onTimeTrackerWorkingSubjectChanged(workingSubject)
                 }
+        }
+    }
+
+    private fun getFilteredSubject(
+        subjects: List<String>,
+        workingSubject: String,
+        isActive: Boolean
+    ): List<String> {
+        val filteredSubjects = subjects
+            .distinct()
+            .filter { it.contains(workingSubject, true) }
+            .filter { it != workingSubject }
+
+        return if (workingSubject.isNotBlank() && !isActive) {
+            filteredSubjects
+        } else {
+            emptyList()
         }
     }
 

@@ -47,7 +47,7 @@ fun TimeTrackerScreen(
         chipsEnabled = state.chipsEnabled,
         isSubjectErrorOccurred = state.isSubjectErrorOccurred,
         selectedChangesType = state.selectedChangesType,
-        filteredSubjectList = state.filteredSubjectList,
+        filteredSubjects = state.filteredSubjects,
         onTimerToggled = viewModel::toggleTimer,
         onResetClicked = viewModel::reset,
         onSubjectErrorChanged = viewModel::onSubjectErrorChanged,
@@ -68,7 +68,7 @@ fun TimeTrackerScreen(
     chipsEnabled: Boolean,
     isSubjectErrorOccurred: Boolean,
     selectedChangesType: TimeAmountChangesType?,
-    filteredSubjectList: List<String>,
+    filteredSubjects: List<String>,
     onTimerToggled: () -> Unit = {},
     onResetClicked: () -> Unit = {},
     onSubjectErrorChanged: (Boolean) -> Unit = {},
@@ -101,7 +101,7 @@ fun TimeTrackerScreen(
             val focusManager = LocalFocusManager.current
             SubjectDropDown(
                 subject = workingSubject,
-                filteredSubjectList = filteredSubjectList,
+                filteredSubjects = filteredSubjects,
                 isSubjectChangeEnabled = !isActive,
                 isSubjectErrorOccurred = isSubjectErrorOccurred,
                 onWorkingSubjectChanged = onWorkingSubjectChanged,
