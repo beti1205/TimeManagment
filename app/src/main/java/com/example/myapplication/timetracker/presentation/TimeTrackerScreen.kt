@@ -34,14 +34,9 @@ fun TimeTrackerScreen(
 
     LifecycleStartEffect(viewModel) {
         viewModel.setWorkingSubjectIfTimerHasBeenResumed()
+        viewModel.onSubjectErrorChanged(false)
 
         onStopOrDispose {  }
-    }
-
-    LaunchedEffect(key1 = state.workingSubject) {
-        if (state.workingSubject.isNotBlank()) {
-            viewModel.onSubjectErrorChanged(false)
-        }
     }
 
     TimeTrackerScreen(

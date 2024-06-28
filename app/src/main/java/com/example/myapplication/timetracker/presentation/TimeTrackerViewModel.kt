@@ -129,7 +129,20 @@ class TimeTrackerViewModel @Inject constructor(
     }
 
     fun onWorkingSubjectChanged(workingSubject: String) {
+        updateWorkingSubject(workingSubject)
+        setSubjectError(workingSubject)
+    }
+
+    private fun updateWorkingSubject(workingSubject: String) {
         this.workingSubject.update { workingSubject }
+    }
+
+    private fun setSubjectError(workingSubject: String) {
+        if (workingSubject.isNotBlank()) {
+            onSubjectErrorChanged(false)
+        } else {
+            onSubjectErrorChanged(true)
+        }
     }
 
     fun onSubjectErrorChanged(isSubjectErrorOccurred: Boolean) {
