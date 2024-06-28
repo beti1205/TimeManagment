@@ -72,6 +72,14 @@ class TimeTrackerViewModel @Inject constructor(
         }
     }
 
+    fun setWorkingSubjectIfTimerHasBeenResumed() {
+        val workingSubject = timeTrackerState.value.workingSubject
+
+        if (workingSubject.isNotBlank()) {
+            onWorkingSubjectChanged(workingSubject)
+        }
+    }
+
     private fun getFilteredSubject(
         subjects: List<String>,
         workingSubject: String,

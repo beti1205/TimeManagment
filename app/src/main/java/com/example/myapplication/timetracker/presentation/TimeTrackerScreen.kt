@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleStartEffect
 import com.example.myapplication.timetracker.presentation.components.ActionButtonRow
 import com.example.myapplication.timetracker.presentation.components.SubjectDropDown
 import com.example.myapplication.timetracker.presentation.components.TimeAmountChangesChips
@@ -30,6 +31,12 @@ fun TimeTrackerScreen(
 ) {
 
     val state by viewModel.state.collectAsState()
+
+    LifecycleStartEffect(viewModel) {
+        viewModel.setWorkingSubjectIfTimerHasBeenResumed()
+
+        onStopOrDispose {  }
+    }
 
     LaunchedEffect(key1 = state.workingSubject) {
         if (state.workingSubject.isNotBlank()) {
