@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,11 +35,12 @@ fun TimeTrackerScreen(
         viewModel.setWorkingSubjectIfTimerHasBeenResumed()
         viewModel.onSubjectErrorChanged(false)
 
-        onStopOrDispose {  }
+        onStopOrDispose { }
     }
 
     TimeTrackerScreen(
         timeAmount = state.timeElapsed.convertSecondsToTimeString(),
+        timeAmountInMilliseconds = state.timeAmountInMilliseconds,
         isActive = state.isActive,
         showEndTime = state.showEndTime,
         startTime = state.startTime,
@@ -62,6 +62,7 @@ fun TimeTrackerScreen(
 @Composable
 fun TimeTrackerScreen(
     timeAmount: String,
+    timeAmountInMilliseconds: Long,
     isActive: Boolean,
     showEndTime: Boolean,
     startTime: Instant?,
@@ -88,7 +89,7 @@ fun TimeTrackerScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Timer(timeAmount = timeAmount)
+        Timer(timeAmount = timeAmount, timeAmountInMilliseconds = timeAmountInMilliseconds)
         Column(
             modifier = Modifier
                 .fillMaxWidth()

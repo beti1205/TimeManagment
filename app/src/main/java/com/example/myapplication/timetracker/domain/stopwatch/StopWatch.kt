@@ -78,7 +78,7 @@ class StopWatch @Inject constructor(private val scope: CoroutineScope) {
             startTime = Instant.now()
             val timeElapsed = state.value.timeElapsed + timeAmount
 
-            delay(1000)
+            delay(100)
 
             state.update {
                 it.copy(

@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Timer(timeAmount: String) {
+fun Timer(timeAmount: String, timeAmountInMilliseconds: Long) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -37,5 +37,8 @@ fun Timer(timeAmount: String) {
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
+        Box(modifier = Modifier.align(Alignment.Center)) {
+            Indicator(timeAmountInMilliseconds)
+        }
     }
 }
