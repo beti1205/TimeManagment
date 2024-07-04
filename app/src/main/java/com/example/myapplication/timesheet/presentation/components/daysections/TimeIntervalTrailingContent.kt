@@ -19,9 +19,9 @@ import com.example.myapplication.utils.convertSecondsToTimeString
 fun TimeIntervalTrailingContent(
     timeInterval: TimeTrackerInterval,
     onTimeTrackerStarted: (String) -> Unit,
-    onDeleteClicked: (Int) -> Unit,
-    onEditClicked: (Int) -> Unit,
-    onIntervalsSectionExpanded: (Int) -> Unit,
+    onDeleteClicked: (String) -> Unit,
+    onEditClicked: (String) -> Unit,
+    onIntervalsSectionExpanded: (String) -> Unit,
     numberOfIntervals: Int? = null
 ) {
     var isExpanded by remember { mutableStateOf(false) }

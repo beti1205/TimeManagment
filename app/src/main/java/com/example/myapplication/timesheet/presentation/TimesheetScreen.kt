@@ -64,12 +64,12 @@ fun TimesheetScreen(
 fun TimesheetScreen(
     state: TimesheetScreenState,
     filterDateOptions: List<DateFilter>,
-    onDeleteTimeInterval: (Int) -> Unit,
+    onDeleteTimeInterval: (String) -> Unit,
     onSaveClicked: () -> Unit,
     onSubjectChanged: (String) -> Unit,
     onStartTimeChanged: (String) -> Unit,
     onEndTimeChanged: (String) -> Unit,
-    onEditClicked: (Int) -> Unit,
+    onEditClicked: (String) -> Unit,
     onDismissAddEditDialog: () -> Unit,
     onTimeTrackerStarted: (String) -> Unit,
     onResetActionClicked: () -> Unit,
@@ -79,9 +79,9 @@ fun TimesheetScreen(
     onSearchToggled: () -> Unit,
     onSubjectSelected: (String) -> Unit,
     onSelectedFilterChanged: (DateFilter) -> Unit,
-    onIntervalsSectionExpanded:(Int) -> Unit
+    onIntervalsSectionExpanded:(String) -> Unit
 ) {
-    var idToBeDeleted: Int? by remember { mutableStateOf(null) }
+    var idToBeDeleted: String? by remember { mutableStateOf(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     var isStartTimePickerSelected: Boolean? by remember { mutableStateOf(null) }
     var showDatePicker by remember { mutableStateOf(false) }
@@ -186,7 +186,7 @@ fun TimesheetScreen(
 @Composable
 fun TimeSheetScreenPreview() {
     val interval = TimeTrackerInterval(
-        id = 1,
+        id = "1",
         timeElapsed = 7,
         workingSubject = "Upgrade SDK",
         date = "Thu, Nov30",
@@ -212,7 +212,7 @@ fun TimeSheetScreenPreview() {
                 )
             ),
             addEditIntervalDialogState = AddEditIntervalDialogState(
-                id = 1,
+                id = "1",
                 subject = "Upgrade SDK",
                 startTime = null,
                 endTime = null,

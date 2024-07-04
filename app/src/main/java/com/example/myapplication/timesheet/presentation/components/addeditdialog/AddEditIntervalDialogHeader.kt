@@ -5,7 +5,7 @@ import androidx.compose.ui.res.stringResource
 import com.example.myapplication.R
 
 @Composable
-fun addEditIntervalDialogHeader(id: Int?) =
+fun addEditIntervalDialogHeader(id: String?) =
     when {
         id != null -> stringResource(id = R.string.edit_menu_item_label)
         else -> stringResource(R.string.add_dialog_header)

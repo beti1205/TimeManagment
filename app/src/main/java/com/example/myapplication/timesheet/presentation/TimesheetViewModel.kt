@@ -63,7 +63,7 @@ class TimesheetViewModel @Inject constructor(
 
     private val selectedFilter: MutableStateFlow<DateFilter> = MutableStateFlow(DateFilter.All)
 
-    private val expandedIntervalsSectionIds: MutableStateFlow<List<Int>> =
+    private val expandedIntervalsSectionIds: MutableStateFlow<List<String>> =
         MutableStateFlow(emptyList())
 
     private val filteredDaySectionsByDay = selectedFilter.combine(
@@ -140,11 +140,11 @@ class TimesheetViewModel @Inject constructor(
         initialValue = TimesheetScreenState()
     )
 
-    fun deleteTimeInterval(id: Int) = viewModelScope.launch {
+    fun deleteTimeInterval(id: String) = viewModelScope.launch {
         deleteTimeIntervalUseCase(id)
     }
 
-    fun onEditClicked(id: Int) {
+    fun onEditClicked(id: String) {
         val interval = state.value.daySections.flatMap { daySection ->
             daySection.timeIntervalsSections.flatMap { section -> section.timeIntervals }
         }.first { interval -> interval.id == id }
@@ -331,7 +331,7 @@ class TimesheetViewModel @Inject constructor(
         selectedFilter.value = filterType
     }
 
-    fun onIntervalsSectionExpanded(id: Int) {
+    fun onIntervalsSectionExpanded(id: String) {
         if (expandedIntervalsSectionIds.value.contains(id)) {
             expandedIntervalsSectionIds.value -= id
         } else {

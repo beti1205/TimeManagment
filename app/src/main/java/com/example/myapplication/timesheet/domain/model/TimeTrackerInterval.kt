@@ -5,7 +5,7 @@ import com.example.myapplication.utils.calculateDaysBetween
 import java.time.Instant
 
 data class TimeTrackerInterval(
-    val id: Int,
+    val id: String,
     val timeElapsed: Long,
     val startTime: Instant?,
     val endTime: Instant?,
@@ -17,7 +17,7 @@ data class TimeTrackerInterval(
 
 fun TimeTrackerEntity.toTimeTrackerInterval(): TimeTrackerInterval{
     return TimeTrackerInterval(
-        id = id,
+        id = id.toString(),
         timeElapsed = endTime!!.epochSecond - startTime!!.epochSecond,
         startTime = startTime,
         endTime = endTime,

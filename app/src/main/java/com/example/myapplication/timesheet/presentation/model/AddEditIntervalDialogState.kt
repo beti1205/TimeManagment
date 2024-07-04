@@ -1,7 +1,7 @@
 package com.example.myapplication.timesheet.presentation.model
 
 data class AddEditIntervalDialogState(
-    val id: Int? = null,
+    val id: String? = null,
     val subject: String,
     val startTime: Time?,
     val endTime: Time?,

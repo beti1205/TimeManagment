@@ -12,10 +12,10 @@ import com.example.myapplication.timesheet.domain.model.TimeTrackerInterval
 @Composable
 fun DaySectionInterval(
     timeInterval: TimeTrackerInterval,
-    onDeleteClicked: (Int) -> Unit,
-    onEditClicked: (Int) -> Unit,
+    onDeleteClicked: (String) -> Unit,
+    onEditClicked: (String) -> Unit,
     onTimeTrackerStarted: (String) -> Unit,
-    onIntervalsSectionExpanded: (Int) -> Unit,
+    onIntervalsSectionExpanded: (String) -> Unit,
     numberOfIntervals: Int? = null
 ) {
     if (timeInterval.startTime != null && timeInterval.endTime != null) {

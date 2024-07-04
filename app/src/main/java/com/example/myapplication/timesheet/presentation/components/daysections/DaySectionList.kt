@@ -21,11 +21,11 @@ import kotlinx.coroutines.launch
 fun DaySectionList(
     daySections: List<DaySection>,
     snackbarHostState: SnackbarHostState,
-    onEditClicked: (Int) -> Unit,
+    onEditClicked: (String) -> Unit,
     onTimeTrackerStarted: (String) -> Unit,
     onResetActionClicked: () -> Unit,
-    onDeleteClicked: (Int) -> Unit,
-    onIntervalsSectionExpanded: (Int) -> Unit
+    onDeleteClicked: (String) -> Unit,
+    onIntervalsSectionExpanded: (String) -> Unit
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -60,10 +60,10 @@ fun DaySectionList(
 @Composable
 fun DaySectionList(
     daySections: List<DaySection>,
-    onDeleteClicked: (Int) -> Unit,
-    onEditClicked: (Int) -> Unit,
+    onDeleteClicked: (String) -> Unit,
+    onEditClicked: (String) -> Unit,
     onTimeTrackerStarted: (String) -> Unit,
-    onIntervalsSectionExpanded: (Int) -> Unit,
+    onIntervalsSectionExpanded: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val daySectionsCollapsedState =

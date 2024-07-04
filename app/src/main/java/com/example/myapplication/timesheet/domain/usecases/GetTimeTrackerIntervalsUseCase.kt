@@ -39,13 +39,16 @@ private fun getGroupedTimeIntervals(
 ): List<TimeIntervalsSection> {
     return intervalsOfDay.groupBy { it.workingSubject }.map { groupedBySubject ->
         val numberOfIntervals = groupedBySubject.value.size
+        val earliestIntervalStartTime = groupedBySubject.value.last().startTime
+        val earliestIntervalId = groupedBySubject.value.last().id
+
         TimeIntervalsSection(
             numberOfIntervals = numberOfIntervals,
             groupedIntervalsSectionHeader = if (numberOfIntervals > 1) {
                 TimeTrackerInterval(
-                    id = groupedBySubject.value.sumOf { it.id.toLong() + it.timeElapsed }.toInt(),
+                    id = "${groupedBySubject.key} $earliestIntervalStartTime $earliestIntervalId",
                     timeElapsed = groupedBySubject.value.sumOf { it.timeElapsed },
-                    startTime = groupedBySubject.value.last().startTime,
+                    startTime = earliestIntervalStartTime,
                     endTime = groupedBySubject.value.first().endTime,
                     workingSubject = groupedBySubject.value.first().workingSubject,
                     date = groupedBySubject.value.last().date
