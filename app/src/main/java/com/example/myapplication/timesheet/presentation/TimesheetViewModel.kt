@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -62,6 +63,9 @@ class TimesheetViewModel @Inject constructor(
 
     private val selectedFilter: MutableStateFlow<DateFilter> = MutableStateFlow(DateFilter.All)
 
+    private val expandedIntervalsSectionIds: MutableStateFlow<List<Int>> =
+        MutableStateFlow(emptyList())
+
     private val filteredDaySectionsByDay = selectedFilter.combine(
         getTimeTrackerIntervalsUseCase(),
     ) { selectedFilter, daySections ->
@@ -92,20 +96,39 @@ class TimesheetViewModel @Inject constructor(
             )
         }
 
+    private val daySections = filteredDaySectionsWithSubjects.map { filteredDaySectionWithSubject ->
+        filteredDaySectionWithSubject.filteredDaySections
+    }.combine(
+        expandedIntervalsSectionIds
+    ) { filteredDaySections, expandedIntervalsSectionIds ->
+        val daySectionsSortedByDates = filteredDaySections.sortedByDescending { it.dateHeader }
+
+        daySectionsSortedByDates.map { daySection ->
+            daySection.copy(timeIntervalsSections = daySection.timeIntervalsSections
+                .map { intervalsSection ->
+                    intervalsSection.copy(
+                        expanded = expandedIntervalsSectionIds.contains(
+                            intervalsSection.groupedIntervalsSectionHeader?.id ?: -1
+                        )
+                    )
+                }
+            )
+        }
+
+    }
+
     val state: StateFlow<TimesheetScreenState> = combine(
         filteredDaySectionsWithSubjects,
         addEditIntervalDialogState,
         searchBarState,
-        selectedFilter
-    ) { filteredDaySectionsWithSubjects, editIntervalDialogState, searchBar, selectedFilter ->
-
-        val filteredDaySections = filteredDaySectionsWithSubjects.filteredDaySections
-        val daySectionsSortedByDates = filteredDaySections.sortedByDescending { it.headerDate }
+        selectedFilter,
+        daySections
+    ) { filteredDaySectionsWithSubjects, editIntervalDialogState, searchBar, selectedFilter, daySections ->
 
         val subjects = filteredDaySectionsWithSubjects.subjects
 
         TimesheetScreenState(
-            daySections = daySectionsSortedByDates,
+            daySections = daySections,
             addEditIntervalDialogState = editIntervalDialogState,
             searchBarState = searchBar,
             subjects = subjects,
@@ -122,9 +145,10 @@ class TimesheetViewModel @Inject constructor(
     }
 
     fun onEditClicked(id: Int) {
-        val interval = state.value.daySections.flatMap { it.timeIntervals }.first { interval ->
-            interval.id == id
-        }
+        val interval = state.value.daySections.flatMap { daySection ->
+            daySection.timeIntervalsSections.flatMap { section -> section.timeIntervals }
+        }.first { interval -> interval.id == id }
+
         val startTime = interval.startTime!!.toTime()
         val endTime = interval.endTime!!.toTime()
 
@@ -305,5 +329,13 @@ class TimesheetViewModel @Inject constructor(
 
     fun onSelectedFilterChanged(filterType: DateFilter) {
         selectedFilter.value = filterType
+    }
+
+    fun onIntervalsSectionExpanded(id: Int) {
+        if (expandedIntervalsSectionIds.value.contains(id)) {
+            expandedIntervalsSectionIds.value -= id
+        } else {
+            expandedIntervalsSectionIds.value += id
+        }
     }
 }

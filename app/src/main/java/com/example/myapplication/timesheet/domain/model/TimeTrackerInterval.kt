@@ -10,9 +10,10 @@ data class TimeTrackerInterval(
     val startTime: Instant?,
     val endTime: Instant?,
     val workingSubject: String,
-    val date: String,
-    val additionalDays: String
-)
+    val date: String
+){
+    val additionalDays = calculateDaysBetween(startTime, endTime)
+}
 
 fun TimeTrackerEntity.toTimeTrackerInterval(): TimeTrackerInterval{
     return TimeTrackerInterval(
@@ -21,7 +22,6 @@ fun TimeTrackerEntity.toTimeTrackerInterval(): TimeTrackerInterval{
         startTime = startTime,
         endTime = endTime,
         workingSubject = workingSubject,
-        date = date,
-        additionalDays = calculateDaysBetween(startTime, endTime)
+        date = date
     )
 }

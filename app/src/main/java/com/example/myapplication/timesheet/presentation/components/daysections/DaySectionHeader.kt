@@ -1,5 +1,6 @@
 package com.example.myapplication.timesheet.presentation.components.daysections
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -13,7 +14,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,24 +24,22 @@ import com.example.myapplication.utils.reformatDate
 @Composable
 fun DaySectionHeader(
     daySection: DaySection,
-    index: Int,
     collapsed: Boolean,
-    collapsedState: SnapshotStateList<Boolean>
+    onDaySectionCollapsed: () -> Unit
 ) {
     Spacer(modifier = Modifier.height(16.dp))
     ListItem(
-        headlineContent = { Text(daySection.headerDate.reformatDate()) },
+        modifier = Modifier.clickable { onDaySectionCollapsed() },
+        headlineContent = { Text(daySection.dateHeader.reformatDate()) },
         shadowElevation = 2.dp,
         colors = ListItemDefaults.colors(
             containerColor = Color.LightGray
         ),
         trailingContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(daySection.headerTimeAmount)
+                Text(daySection.timeAmountHeader)
                 Spacer(modifier = Modifier.width(8.dp))
-                IconButton(onClick = {
-                    collapsedState[index] = !collapsed
-                }) {
+                IconButton(onClick = onDaySectionCollapsed) {
                     Icon(
                         imageVector = if (collapsed) {
                             Icons.Default.ArrowDropDown

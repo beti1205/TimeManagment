@@ -26,7 +26,7 @@ fun TimeIntervalSupportingContent(
         )
         if (timeInterval.additionalDays != "0") {
             Text(
-                text = "+ ${timeInterval.additionalDays}",
+                text = "+ ${timeInterval.additionalDays} days",
                 modifier = Modifier.padding(horizontal = 16.dp),
                 style = MaterialTheme.typography.bodySmall.copy(
                     fontWeight = FontWeight.Bold,

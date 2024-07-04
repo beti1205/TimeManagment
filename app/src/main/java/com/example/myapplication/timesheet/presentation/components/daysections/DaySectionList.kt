@@ -24,7 +24,8 @@ fun DaySectionList(
     onEditClicked: (Int) -> Unit,
     onTimeTrackerStarted: (String) -> Unit,
     onResetActionClicked: () -> Unit,
-    onDeleteClicked: (Int) -> Unit
+    onDeleteClicked: (Int) -> Unit,
+    onIntervalsSectionExpanded: (Int) -> Unit
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -51,6 +52,8 @@ fun DaySectionList(
 
             }
         },
+        onIntervalsSectionExpanded = onIntervalsSectionExpanded
+
     )
 }
 
@@ -60,34 +63,56 @@ fun DaySectionList(
     onDeleteClicked: (Int) -> Unit,
     onEditClicked: (Int) -> Unit,
     onTimeTrackerStarted: (String) -> Unit,
+    onIntervalsSectionExpanded: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val collapsedState = remember(daySections) { daySections.map { false }.toMutableStateList() }
+    val daySectionsCollapsedState =
+        remember(daySections) { daySections.map { false }.toMutableStateList() }
 
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         modifier = modifier
     ) {
         daySections.forEachIndexed { i, daySection ->
-            val collapsed = collapsedState[i]
+            val collapsed = daySectionsCollapsedState[i]
 
             item(key = "header_$i") {
                 DaySectionHeader(
                     daySection = daySection,
-                    index = i,
                     collapsed = collapsed,
-                    collapsedState = collapsedState
+                    onDaySectionCollapsed = { daySectionsCollapsedState[i] = !collapsed }
                 )
             }
-
             if (!collapsed) {
-                items(items = daySection.timeIntervals, key = { it.id }) { timeInterval ->
-                    DaySectionIntervals(
-                        timeInterval = timeInterval,
-                        onDeleteClicked = onDeleteClicked,
-                        onEditClicked = onEditClicked,
-                        onTimeTrackerStarted = onTimeTrackerStarted
-                    )
+                daySection.timeIntervalsSections.forEachIndexed { index, timeIntervalsSection ->
+                    val groupedIntervalsSectionHeader = timeIntervalsSection.groupedIntervalsSectionHeader
+
+                    if (groupedIntervalsSectionHeader != null) {
+                        item(groupedIntervalsSectionHeader.id) {
+                            DaySectionInterval(
+                                timeInterval = groupedIntervalsSectionHeader,
+                                numberOfIntervals = timeIntervalsSection.numberOfIntervals,
+                                onDeleteClicked = {},
+                                onEditClicked = {},
+                                onTimeTrackerStarted = {},
+                                onIntervalsSectionExpanded = onIntervalsSectionExpanded
+                            )
+                        }
+                    }
+
+                    if (timeIntervalsSection.expanded || groupedIntervalsSectionHeader == null) {
+                        items(
+                            items = timeIntervalsSection.timeIntervals,
+                            key = { it.id }) { timeInterval ->
+                            DaySectionInterval(
+                                timeInterval = timeInterval,
+                                onDeleteClicked = onDeleteClicked,
+                                onEditClicked = onEditClicked,
+                                onTimeTrackerStarted = onTimeTrackerStarted,
+                                onIntervalsSectionExpanded = onIntervalsSectionExpanded
+                            )
+                        }
+                    }
                 }
             }
         }

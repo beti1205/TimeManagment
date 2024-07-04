@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.timesheet.domain.model.TimeTrackerInterval
+import com.example.myapplication.timesheet.presentation.model.TimeIntervalsSection
 import com.example.myapplication.timesheet.presentation.components.addeditdialog.AddEditTimeIntervalDialog
 import com.example.myapplication.timesheet.presentation.components.addeditdialog.DatePickerDialog
 import com.example.myapplication.timesheet.presentation.components.DeleteDialog
@@ -54,7 +55,8 @@ fun TimesheetScreen(
         onSearchTextChanged = viewModel::onSearchTextChanged,
         onSearchToggled = viewModel::onSearchToggled,
         onSubjectSelected = viewModel::onSubjectSelected,
-        onSelectedFilterChanged = viewModel::onSelectedFilterChanged
+        onSelectedFilterChanged = viewModel::onSelectedFilterChanged,
+        onIntervalsSectionExpanded = viewModel::onIntervalsSectionExpanded
     )
 }
 
@@ -76,7 +78,8 @@ fun TimesheetScreen(
     onSearchTextChanged: (String) -> Unit,
     onSearchToggled: () -> Unit,
     onSubjectSelected: (String) -> Unit,
-    onSelectedFilterChanged: (DateFilter) -> Unit
+    onSelectedFilterChanged: (DateFilter) -> Unit,
+    onIntervalsSectionExpanded:(Int) -> Unit
 ) {
     var idToBeDeleted: Int? by remember { mutableStateOf(null) }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -162,12 +165,15 @@ fun TimesheetScreen(
                         onEditClicked = onEditClicked,
                         onTimeTrackerStarted = onTimeTrackerStarted,
                         onResetActionClicked = onResetActionClicked,
-                        onDeleteClicked = { idToBeDeleted = it }
+                        onDeleteClicked = { idToBeDeleted = it },
+                        onIntervalsSectionExpanded = onIntervalsSectionExpanded
                     )
                 }
+
                 state.isNotFindingResults -> {
                     NoSearchResultsScreen()
                 }
+
                 else -> {
                     EmptyStateScreen()
                 }
@@ -179,21 +185,28 @@ fun TimesheetScreen(
 @Preview
 @Composable
 fun TimeSheetScreenPreview() {
+    val interval = TimeTrackerInterval(
+        id = 1,
+        timeElapsed = 7,
+        workingSubject = "Upgrade SDK",
+        date = "Thu, Nov30",
+        startTime = Instant.now(),
+        endTime = Instant.now()
+    )
+    val timeIntervals = listOf(
+        interval
+    )
     TimesheetScreen(
         state = TimesheetScreenState(
             daySections = listOf(
                 DaySection(
-                    headerDate = "Thu, Nov30",
-                    headerTimeAmount = "01:59:06",
-                    timeIntervals = listOf(
-                        TimeTrackerInterval(
-                            id = 1,
-                            timeElapsed = 7,
-                            workingSubject = "Upgrade SDK",
-                            date = "Thu, Nov30",
-                            startTime = Instant.now(),
-                            endTime = Instant.now(),
-                            additionalDays = "0"
+                    dateHeader = "Thu, Nov30",
+                    timeAmountHeader = "01:59:06",
+                    timeIntervalsSections = listOf(
+                        TimeIntervalsSection(
+                            numberOfIntervals = 1,
+                            groupedIntervalsSectionHeader = interval,
+                            timeIntervals = timeIntervals
                         )
                     )
                 )
@@ -223,6 +236,7 @@ fun TimeSheetScreenPreview() {
         onSearchToggled = {},
         onSearchTextChanged = {},
         onSubjectSelected = {},
-        onSelectedFilterChanged = {}
+        onSelectedFilterChanged = {},
+        onIntervalsSectionExpanded = {}
     )
 }

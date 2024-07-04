@@ -78,7 +78,8 @@ fun String.formatDateWithDash(): String {
     return "$year-$month-$day"
 }
 
-fun calculateDaysBetween(start: Instant, end: Instant): String {
+fun calculateDaysBetween(start: Instant?, end: Instant?): String {
+    if (start == null || end == null) return "0"
     val startDate = start.atZone(ZoneId.systemDefault()).toLocalDate()
     val endDate = end.atZone(ZoneId.systemDefault()).toLocalDate()
     val days = endDate.toEpochDay() - startDate.toEpochDay()

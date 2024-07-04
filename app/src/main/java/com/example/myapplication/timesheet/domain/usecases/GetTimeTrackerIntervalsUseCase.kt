@@ -1,8 +1,10 @@
 package com.example.myapplication.timesheet.domain.usecases
 
 import com.example.myapplication.data.TimeTrackerRepository
+import com.example.myapplication.timesheet.domain.model.TimeTrackerInterval
 import com.example.myapplication.timesheet.domain.model.toTimeTrackerInterval
 import com.example.myapplication.timesheet.presentation.model.DaySection
+import com.example.myapplication.timesheet.presentation.model.TimeIntervalsSection
 import com.example.myapplication.utils.convertSecondsToTimeString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -23,11 +25,35 @@ class GetTimeTrackerIntervalsUseCaseImpl(
                         it.timeElapsed
                     }.convertSecondsToTimeString()
                     DaySection(
-                        headerDate = group.key,
-                        headerTimeAmount = timeAmount,
-                        timeIntervals = group.value
+                        dateHeader = group.key,
+                        timeAmountHeader = timeAmount,
+                        timeIntervalsSections = getGroupedTimeIntervals(group.value)
                     )
                 }
         }
+    }
+}
+
+private fun getGroupedTimeIntervals(
+    intervalsOfDay: List<TimeTrackerInterval>
+): List<TimeIntervalsSection> {
+    return intervalsOfDay.groupBy { it.workingSubject }.map { groupedBySubject ->
+        val numberOfIntervals = groupedBySubject.value.size
+        TimeIntervalsSection(
+            numberOfIntervals = numberOfIntervals,
+            groupedIntervalsSectionHeader = if (numberOfIntervals > 1) {
+                TimeTrackerInterval(
+                    id = groupedBySubject.value.sumOf { it.id.toLong() + it.timeElapsed }.toInt(),
+                    timeElapsed = groupedBySubject.value.sumOf { it.timeElapsed },
+                    startTime = groupedBySubject.value.last().startTime,
+                    endTime = groupedBySubject.value.first().endTime,
+                    workingSubject = groupedBySubject.value.first().workingSubject,
+                    date = groupedBySubject.value.last().date
+                )
+            } else {
+                null
+            },
+            timeIntervals = groupedBySubject.value
+        )
     }
 }
