@@ -1,7 +1,6 @@
 package com.example.myapplication.timetracker.presentation.components
 
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -20,7 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 
@@ -31,22 +29,23 @@ fun SubjectDropDown(
     subject: String,
     isSubjectChangeEnabled: Boolean,
     isSubjectErrorOccurred: Boolean,
-    filteredSubjectList: List<String>,
-    onWorkingSubjectChanged: (String) -> Unit = {},
-    clearFocus: () -> Unit
+    filteredSubjects: List<String>,
+    modifier: Modifier = Modifier,
+    clearFocus: () -> Unit,
+    onWorkingSubjectChanged: (String) -> Unit = {}
 ) {
 
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
-        modifier = Modifier.padding(horizontal = 64.dp),
+        modifier = modifier,
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
     ) {
         OutlinedTextField(
             modifier = Modifier
-                .menuAnchor()
-                .offset(y = (-32).dp),
+                .fillMaxWidth()
+                .menuAnchor(),
             textStyle = TextStyle.Default.copy(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Light
@@ -60,12 +59,13 @@ fun SubjectDropDown(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             maxLines = 3,
         )
-        if (filteredSubjectList.isNotEmpty() && subject.isNotBlank() && isSubjectChangeEnabled) {
+        if (filteredSubjects.isNotEmpty()) {
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
+                modifier = Modifier.fillMaxWidth()
             ) {
-                filteredSubjectList.forEach { selectionOption ->
+                filteredSubjects.forEach { selectionOption ->
                     DropdownMenuItem(
                         text = { Text(selectionOption) },
                         onClick = {

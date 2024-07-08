@@ -1,40 +1,27 @@
 package com.example.myapplication.timetracker.presentation
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Pause
-import androidx.compose.material.icons.outlined.PlayArrow
-import androidx.compose.material.icons.outlined.RestartAlt
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.myapplication.R
+import androidx.lifecycle.compose.LifecycleStartEffect
+import com.example.myapplication.timetracker.presentation.components.ActionButtonRow
 import com.example.myapplication.timetracker.presentation.components.SubjectDropDown
+import com.example.myapplication.timetracker.presentation.components.TimeAdjustmentChips
+import com.example.myapplication.timetracker.presentation.components.TimeInterval
+import com.example.myapplication.timetracker.presentation.components.Timer
+import com.example.myapplication.timetracker.presentation.components.TimesheetButton
 import com.example.myapplication.utils.convertSecondsToTimeString
+import java.time.Instant
 
 @Composable
 fun TimeTrackerScreen(
@@ -44,108 +31,97 @@ fun TimeTrackerScreen(
 
     val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(key1 = state.workingSubject) {
-        if (state.workingSubject.isNotBlank()) {
-            viewModel.onSubjectErrorChanged(false)
-        }
+    LifecycleStartEffect(viewModel) {
+        viewModel.setWorkingSubjectIfTimerHasBeenResumed()
+        viewModel.onSubjectErrorChanged(false)
+
+        onStopOrDispose { }
     }
 
     TimeTrackerScreen(
         timeAmount = state.timeElapsed.convertSecondsToTimeString(),
+        timeAmountInMilliseconds = state.timeAmountInMilliseconds,
         isActive = state.isActive,
+        showEndTime = state.showEndTime,
+        startTime = state.startTime,
+        endTime = state.endTime,
         workingSubject = state.workingSubject,
+        chipsEnabled = state.chipsEnabled,
         isSubjectErrorOccurred = state.isSubjectErrorOccurred,
-        filteredSubjectList = state.filteredSubjectList,
+        selectedTimeAdjustment = state.selectedTimeAdjustment,
+        filteredSubjects = state.filteredSubjects,
         onTimerToggled = viewModel::toggleTimer,
         onResetClicked = viewModel::reset,
         onSubjectErrorChanged = viewModel::onSubjectErrorChanged,
         onWorkingSubjectChanged = viewModel::onWorkingSubjectChanged,
-        onNavigateToTimeSheet = onNavigateToTimeSheet
+        onNavigateToTimeSheet = onNavigateToTimeSheet,
+        onTypeSelected = viewModel::onTypeSelected
     )
 }
 
 @Composable
 fun TimeTrackerScreen(
     timeAmount: String,
+    timeAmountInMilliseconds: Long,
     isActive: Boolean,
+    showEndTime: Boolean,
+    startTime: Instant?,
+    endTime: Instant?,
     workingSubject: String,
+    chipsEnabled: Boolean,
     isSubjectErrorOccurred: Boolean,
-    filteredSubjectList: List<String>,
+    selectedTimeAdjustment: TimeAdjustment?,
+    filteredSubjects: List<String>,
     onTimerToggled: () -> Unit = {},
     onResetClicked: () -> Unit = {},
     onSubjectErrorChanged: (Boolean) -> Unit = {},
     onWorkingSubjectChanged: (String) -> Unit = {},
-    onNavigateToTimeSheet: () -> Unit
+    onNavigateToTimeSheet: () -> Unit,
+    onTypeSelected: (TimeAdjustment) -> Unit
 ) {
+    TimeInterval(
+        startTime = startTime,
+        showEndTime = showEndTime,
+        endTime = endTime
+    )
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box(
+        Timer(timeAmount = timeAmount, timeAmountInMilliseconds = timeAmountInMilliseconds)
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(1f)
+                .padding(horizontal = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize(0.5f)
-                    .clip(CircleShape)
-                    .background(Color.LightGray)
-                    .align(Alignment.Center)
+            TimeAdjustmentChips(
+                selectedTimeAdjustment = selectedTimeAdjustment,
+                onTypeSelected = onTypeSelected,
+                chipsEnabled = chipsEnabled
             )
-            Text(
-                text = timeAmount,
+            val focusManager = LocalFocusManager.current
+            SubjectDropDown(
+                subject = workingSubject,
+                filteredSubjects = filteredSubjects,
+                isSubjectChangeEnabled = !isActive,
+                isSubjectErrorOccurred = isSubjectErrorOccurred,
+                onWorkingSubjectChanged = onWorkingSubjectChanged,
+                clearFocus = { focusManager.clearFocus() },
                 modifier = Modifier
-                    .padding(16.dp)
-                    .align(Alignment.Center),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
             )
-        }
-        val focusManager = LocalFocusManager.current
-        SubjectDropDown(
-            subject = workingSubject,
-            filteredSubjectList = filteredSubjectList,
-            isSubjectChangeEnabled = !isActive,
-            isSubjectErrorOccurred = isSubjectErrorOccurred,
-            onWorkingSubjectChanged = onWorkingSubjectChanged,
-            clearFocus = { focusManager.clearFocus() }
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Button(
-                onClick = {
-                    if (workingSubject.isNotBlank()) {
-                        focusManager.clearFocus()
-                        onTimerToggled()
-                    } else {
-                        onSubjectErrorChanged(true)
-                    }
-                },
-                shape = CircleShape,
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 7.dp)
-            ) {
-                if (!isActive) {
-                    Icon(imageVector = Icons.Outlined.PlayArrow, contentDescription = null)
-                } else {
-                    Icon(imageVector = Icons.Outlined.Pause, contentDescription = null)
-                }
-            }
-            Button(
-                onClick = onResetClicked,
-                shape = CircleShape,
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 7.dp)
-            ) {
-                Icon(imageVector = Icons.Outlined.RestartAlt, contentDescription = null)
-            }
-        }
-        Button(onClick = onNavigateToTimeSheet) {
-            Text(text = stringResource(R.string.timesheet))
+            ActionButtonRow(
+                workingSubject = workingSubject,
+                clearDropDownFocus = { focusManager.clearFocus() },
+                onTimerToggled = onTimerToggled,
+                onSubjectErrorChanged = onSubjectErrorChanged,
+                isActive = isActive,
+                onResetClicked = onResetClicked
+            )
+            TimesheetButton(onNavigateToTimeSheet)
         }
     }
 }

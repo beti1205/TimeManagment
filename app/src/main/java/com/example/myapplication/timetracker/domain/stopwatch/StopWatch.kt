@@ -1,5 +1,6 @@
 package com.example.myapplication.timetracker.domain.stopwatch
 
+import com.example.myapplication.utils.convertSecondsToTimeString
 import com.example.myapplication.utils.formatToLongDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -7,9 +8,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.math.abs
 
 @Singleton
 class StopWatch @Inject constructor(private val scope: CoroutineScope) {
@@ -49,7 +52,14 @@ class StopWatch @Inject constructor(private val scope: CoroutineScope) {
         if (state.value.isActive) {
             counterJob?.cancel()
         }
-        state.update { it.copy(isActive = false, timeElapsed = 0L) }
+        state.update {
+            it.copy(
+                isActive = false,
+                timeElapsed = 0L,
+                startTime = null,
+                endTime = null
+            )
+        }
     }
 
     private suspend fun startCountingUp() {
@@ -68,7 +78,7 @@ class StopWatch @Inject constructor(private val scope: CoroutineScope) {
             startTime = Instant.now()
             val timeElapsed = state.value.timeElapsed + timeAmount
 
-            delay(1000)
+            delay(100)
 
             state.update {
                 it.copy(
@@ -77,5 +87,26 @@ class StopWatch @Inject constructor(private val scope: CoroutineScope) {
                 )
             }
         }
+    }
+
+    fun adjustTime(minutes: Int) {
+        if (state.value.endTime == null || isNotPossibleToSubtract(minutes)) return
+
+        val adjustedEndTime = state.value.endTime?.plus(Duration.ofMinutes(minutes.toLong()))
+        updateEndTime(adjustedEndTime)
+    }
+
+    private fun updateEndTime(newEndTime: Instant?) {
+        state.update {
+            it.copy(
+                endTime = newEndTime
+            )
+        }
+    }
+
+    private fun isNotPossibleToSubtract(minutes: Int): Boolean {
+        val seconds = abs(minutes) * 60
+
+        return minutes < 0 && state.value.timeElapsed < seconds
     }
 }

@@ -86,4 +86,8 @@ class TimeTracker @Inject constructor(
             stopWatch.start()
         }
     }
+
+    fun adjustTime(minutes: Int) {
+        stopWatch.adjustTime(minutes)
+    }
 }

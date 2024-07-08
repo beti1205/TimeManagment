@@ -9,5 +9,11 @@ data class TimeTrackerScreenState(
     val endTime: Instant? = null,
     val workingSubject: String = "",
     val isSubjectErrorOccurred: Boolean = false,
-    val filteredSubjectList: List<String> = emptyList()
-)
+    val filteredSubjects: List<String> = emptyList(),
+    val selectedTimeAdjustment: TimeAdjustment? = null
+) {
+    val showEndTime = endTime != null && !isActive
+    val chipsEnabled = isActive || (timeElapsed == 0L && endTime == null)
+    val timeAmountInMilliseconds = (endTime?.toEpochMilli()
+        ?: startTime?.toEpochMilli() ?: 0L) - (startTime?.toEpochMilli() ?: 0L)
+}
