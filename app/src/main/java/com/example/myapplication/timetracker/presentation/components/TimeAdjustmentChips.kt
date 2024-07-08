@@ -11,13 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
-import com.example.myapplication.timetracker.presentation.TimeAmountChangesType
+import com.example.myapplication.timetracker.presentation.TimeAdjustment
 
 @Composable
-fun TimeAmountChangesChips(
-    selectedChangesType: TimeAmountChangesType?,
+fun TimeAdjustmentChips(
+    selectedTimeAdjustment: TimeAdjustment?,
     chipsEnabled: Boolean,
-    onTypeSelected: (TimeAmountChangesType) -> Unit
+    onTypeSelected: (TimeAdjustment) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -25,14 +25,14 @@ fun TimeAmountChangesChips(
             .padding(vertical = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        TimeAmountChangesType.entries.forEach { chip ->
+        TimeAdjustment.entries.forEach { chip ->
             FilterChip(
                 label = {
                     Text(
                         getTypeName(chip)
                     )
                 },
-                selected = selectedChangesType == chip,
+                selected = selectedTimeAdjustment == chip,
                 onClick = { onTypeSelected(chip) },
                 enabled = chipsEnabled
             )
@@ -41,12 +41,12 @@ fun TimeAmountChangesChips(
 }
 
 @Composable
-fun getTypeName(chip: TimeAmountChangesType) =
+fun getTypeName(chip: TimeAdjustment) =
     when (chip) {
-        TimeAmountChangesType.INCREASED_5 -> stringResource(R.string.increased_5)
-        TimeAmountChangesType.INCREASED_15 -> stringResource(R.string.increased_15)
-        TimeAmountChangesType.INCREASED_30 -> stringResource(R.string.increased_30)
-        TimeAmountChangesType.REDUCED_5 -> stringResource(R.string.reduced_5)
-        TimeAmountChangesType.REDUCED_15 -> stringResource(R.string.reduced_15)
-        TimeAmountChangesType.REDUCED_30 -> stringResource(R.string.reduced_30)
+        TimeAdjustment.PLUS_5 -> stringResource(R.string.plus_5)
+        TimeAdjustment.PLUS_15 -> stringResource(R.string.plus_15)
+        TimeAdjustment.PLUS_30 -> stringResource(R.string.plus_30)
+        TimeAdjustment.MINUS_5 -> stringResource(R.string.minus_5)
+        TimeAdjustment.MINUS_15 -> stringResource(R.string.minus_15)
+        TimeAdjustment.MINUS_30 -> stringResource(R.string.minus_30)
     }

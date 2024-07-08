@@ -16,7 +16,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleStartEffect
 import com.example.myapplication.timetracker.presentation.components.ActionButtonRow
 import com.example.myapplication.timetracker.presentation.components.SubjectDropDown
-import com.example.myapplication.timetracker.presentation.components.TimeAmountChangesChips
+import com.example.myapplication.timetracker.presentation.components.TimeAdjustmentChips
 import com.example.myapplication.timetracker.presentation.components.TimeInterval
 import com.example.myapplication.timetracker.presentation.components.Timer
 import com.example.myapplication.timetracker.presentation.components.TimesheetButton
@@ -48,7 +48,7 @@ fun TimeTrackerScreen(
         workingSubject = state.workingSubject,
         chipsEnabled = state.chipsEnabled,
         isSubjectErrorOccurred = state.isSubjectErrorOccurred,
-        selectedChangesType = state.selectedChangesType,
+        selectedTimeAdjustment = state.selectedTimeAdjustment,
         filteredSubjects = state.filteredSubjects,
         onTimerToggled = viewModel::toggleTimer,
         onResetClicked = viewModel::reset,
@@ -70,14 +70,14 @@ fun TimeTrackerScreen(
     workingSubject: String,
     chipsEnabled: Boolean,
     isSubjectErrorOccurred: Boolean,
-    selectedChangesType: TimeAmountChangesType?,
+    selectedTimeAdjustment: TimeAdjustment?,
     filteredSubjects: List<String>,
     onTimerToggled: () -> Unit = {},
     onResetClicked: () -> Unit = {},
     onSubjectErrorChanged: (Boolean) -> Unit = {},
     onWorkingSubjectChanged: (String) -> Unit = {},
     onNavigateToTimeSheet: () -> Unit,
-    onTypeSelected: (TimeAmountChangesType) -> Unit
+    onTypeSelected: (TimeAdjustment) -> Unit
 ) {
     TimeInterval(
         startTime = startTime,
@@ -96,8 +96,8 @@ fun TimeTrackerScreen(
                 .padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            TimeAmountChangesChips(
-                selectedChangesType = selectedChangesType,
+            TimeAdjustmentChips(
+                selectedTimeAdjustment = selectedTimeAdjustment,
                 onTypeSelected = onTypeSelected,
                 chipsEnabled = chipsEnabled
             )

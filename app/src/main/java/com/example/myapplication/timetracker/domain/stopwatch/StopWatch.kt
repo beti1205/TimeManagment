@@ -107,10 +107,6 @@ class StopWatch @Inject constructor(private val scope: CoroutineScope) {
     private fun isNotPossibleToSubtract(minutes: Int): Boolean {
         val seconds = abs(minutes) * 60
 
-        if (minutes < 0 && state.value.timeElapsed < seconds) {
-            return true
-        } else {
-            return false
-        }
+        return minutes < 0 && state.value.timeElapsed < seconds
     }
 }
