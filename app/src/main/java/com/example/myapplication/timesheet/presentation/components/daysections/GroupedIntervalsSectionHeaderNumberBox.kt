@@ -3,6 +3,7 @@ package com.example.myapplication.timesheet.presentation.components.daysections
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
@@ -19,7 +20,7 @@ fun GroupedIntervalsSectionHeaderNumberBox(
     numberOfIntervals: Int,
     onIntervalsSectionExpanded: () -> Unit
 ) {
-    Box(modifier = Modifier.size(48.dp))
+    Spacer(modifier = Modifier.size(48.dp))
     Box(
         modifier = Modifier
             .padding(horizontal = 8.dp)

@@ -28,7 +28,7 @@ class GetFilteredDaySectionsUseCaseImpl : GetFilteredDaySectionsUseCase {
     private fun DaySection.toDaySectionWithMatchingIntervals(
         searchText: String
     ): DaySection? {
-        val matchingIntervals = this.timeIntervalsSections.filter { timeIntervalsSection ->
+        val matchingIntervals = timeIntervalsSections.filter { timeIntervalsSection ->
             timeIntervalsSection.timeIntervals.any { timeInterval ->
                 timeInterval.workingSubject == searchText
             }
@@ -36,10 +36,11 @@ class GetFilteredDaySectionsUseCaseImpl : GetFilteredDaySectionsUseCase {
 
         return if (matchingIntervals.isNotEmpty()) {
             DaySection(
-                dateHeader = this.dateHeader,
-                timeAmountHeader = matchingIntervals.flatMap { timeIntervalsSection ->
-                    timeIntervalsSection.timeIntervals
-                }.sumOf { timeInterval -> timeInterval.timeElapsed }.convertSecondsToTimeString(),
+                dateHeader = dateHeader,
+                timeAmountHeader = matchingIntervals
+                    .flatMap { timeIntervalsSection -> timeIntervalsSection.timeIntervals }
+                    .sumOf { timeInterval -> timeInterval.timeElapsed }
+                    .convertSecondsToTimeString(),
                 timeIntervalsSections = matchingIntervals
             )
         } else {

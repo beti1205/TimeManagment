@@ -38,25 +38,27 @@ private fun getGroupedTimeIntervals(
     intervalsOfDay: List<TimeTrackerInterval>
 ): List<TimeIntervalsSection> {
     return intervalsOfDay.groupBy { it.workingSubject }.map { groupedBySubject ->
-        val numberOfIntervals = groupedBySubject.value.size
-        val earliestIntervalStartTime = groupedBySubject.value.last().startTime
-        val earliestIntervalId = groupedBySubject.value.last().id
+        groupedBySubject.value.run {
+            val numberOfIntervals = size
+            val earliestIntervalStartTime = last().startTime
+            val earliestIntervalId = last().id
 
-        TimeIntervalsSection(
-            numberOfIntervals = numberOfIntervals,
-            groupedIntervalsSectionHeader = if (numberOfIntervals > 1) {
-                TimeTrackerInterval(
-                    id = "${groupedBySubject.key} $earliestIntervalStartTime $earliestIntervalId",
-                    timeElapsed = groupedBySubject.value.sumOf { it.timeElapsed },
-                    startTime = earliestIntervalStartTime,
-                    endTime = groupedBySubject.value.first().endTime,
-                    workingSubject = groupedBySubject.value.first().workingSubject,
-                    date = groupedBySubject.value.last().date
-                )
-            } else {
-                null
-            },
-            timeIntervals = groupedBySubject.value
-        )
+            TimeIntervalsSection(
+                numberOfIntervals = numberOfIntervals,
+                groupedIntervalsSectionHeader = if (numberOfIntervals > 1) {
+                    TimeTrackerInterval(
+                        id = "${groupedBySubject.key} $earliestIntervalStartTime $earliestIntervalId",
+                        timeElapsed = sumOf { it.timeElapsed },
+                        startTime = earliestIntervalStartTime,
+                        endTime = first().endTime,
+                        workingSubject = first().workingSubject,
+                        date = last().date
+                    )
+                } else {
+                    null
+                },
+                timeIntervals = this
+            )
+        }
     }
 }
