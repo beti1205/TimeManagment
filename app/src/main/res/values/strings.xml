@@ -25,7 +25,7 @@
     <string name="edit_dialog_start_date_label">Start date</string>
     <string name="edit_dialog_error_supporting_text">Incorrect date was entered</string>
     <string name="search_bar_search_placeholder">Search</string>
-    <string name="add_dialog_header">Add time entity</string>
+    <string name="add_dialog_header">Add time interval</string>
     <string name="search_no_matches_info">No matches for this search</string>
     <string name="snackbar_time_tracker_started">Time tracker started</string>
     <string name="snackbar_action_reset">Reset</string>
@@ -40,4 +40,6 @@
     <string name="minus_5">-5</string>
     <string name="minus_15">-15</string>
     <string name="minus_30">-30</string>
+    <string name="additional_days">+ %s days</string>
+    <string name="time_interval">%s - %s</string>
 </resources>

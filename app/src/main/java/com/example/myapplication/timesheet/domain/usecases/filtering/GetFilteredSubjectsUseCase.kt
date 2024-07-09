@@ -19,7 +19,9 @@ class GetFilteredSubjectsUseCaseUseCaseImpl : GetFilteredSubjectsUseCase {
     ) = if (filteredDaySectionsByDay.isNotEmpty() && isSearching) {
         filteredDaySectionsByDay
             .flatMap { daySection ->
-                daySection.timeIntervals.map { it.workingSubject }
+                daySection.timeIntervalsSections.flatMap { timeIntervalsSection ->
+                    timeIntervalsSection.timeIntervals
+                }.map { timeInterval -> timeInterval.workingSubject }
             }
             .distinct()
             .filter { subject ->
@@ -31,5 +33,4 @@ class GetFilteredSubjectsUseCaseUseCaseImpl : GetFilteredSubjectsUseCase {
     } else {
         emptyList()
     }
-
 }

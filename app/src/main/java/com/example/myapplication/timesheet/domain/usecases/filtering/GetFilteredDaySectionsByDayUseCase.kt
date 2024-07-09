@@ -23,24 +23,24 @@ class GetFilteredDaySectionsByDayUseCaseImpl : GetFilteredDaySectionsByDayUseCas
         return when (selectedFilter) {
             is DateFilter.All -> daySections
             is DateFilter.Today -> daySections.filter { daySection ->
-                daySection.headerDate == Instant.now().formatToLongDate()
+                daySection.dateHeader == Instant.now().formatToLongDate()
             }
 
             is DateFilter.Yesterday -> daySections.filter { daySection ->
-                daySection.headerDate == (Instant.now().minus(Duration.ofDays(1))
+                daySection.dateHeader == (Instant.now().minus(Duration.ofDays(1))
                     .formatToLongDate())
             }
 
             is DateFilter.ThisWeek -> daySections.filter { daySection ->
-                daySection.headerDate.isInWeek()
+                daySection.dateHeader.isInWeek()
             }
 
             is DateFilter.LastWeek -> daySections.filter { daySection ->
-                daySection.headerDate.isInWeek(lastWeek = true)
+                daySection.dateHeader.isInWeek(lastWeek = true)
             }
 
             is DateFilter.CustomRange -> daySections.filter { daySection ->
-                daySection.headerDate.isInCustomRange(
+                daySection.dateHeader.isInCustomRange(
                     startDate = selectedFilter.startDate,
                     endDate = selectedFilter.endDate
                 )

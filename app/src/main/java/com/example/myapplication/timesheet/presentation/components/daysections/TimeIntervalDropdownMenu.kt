@@ -15,9 +15,9 @@ import com.example.myapplication.timesheet.domain.model.TimeTrackerInterval
 @Composable
 fun TimeIntervalDropdownMenu(
     isExpanded: Boolean,
-    onDeleteClicked: (Int) -> Unit,
+    onDeleteClicked: (String) -> Unit,
     timeInterval: TimeTrackerInterval,
-    onEditClicked: (Int) -> Unit,
+    onEditClicked: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
     DropdownMenu(

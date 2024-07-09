@@ -4,13 +4,13 @@ import com.example.myapplication.data.TimeTrackerRepository
 import javax.inject.Inject
 
 interface DeleteTimeIntervalUseCase {
-    suspend operator fun invoke(id: Int)
+    suspend operator fun invoke(id: String)
 }
 
 class DeleteTimeIntervalUseCaseImpl(
     private val repository: TimeTrackerRepository
 ) : DeleteTimeIntervalUseCase {
-    override suspend fun invoke(id: Int) {
-        return repository.deleteTimeInterval(id)
+    override suspend fun invoke(id: String) {
+        return repository.deleteTimeInterval(id.toInt())
     }
 }

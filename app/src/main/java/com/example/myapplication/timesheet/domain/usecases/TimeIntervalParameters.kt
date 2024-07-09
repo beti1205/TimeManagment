@@ -4,7 +4,7 @@ import com.example.myapplication.data.TimeTrackerEntity
 import java.time.Instant
 
 data class TimeIntervalParameters(
-    val id: Int = 0,
+    val id: String = "0",
     val startTime: Instant,
     val endTime: Instant,
     val subject: String,
@@ -13,7 +13,7 @@ data class TimeIntervalParameters(
 
 fun TimeIntervalParameters.asTimeTrackerEntity(): TimeTrackerEntity {
     return TimeTrackerEntity(
-        id = id,
+        id = id.toInt(),
         startTime = startTime,
         endTime = endTime,
         workingSubject = subject,

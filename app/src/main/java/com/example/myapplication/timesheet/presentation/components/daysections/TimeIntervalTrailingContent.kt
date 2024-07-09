@@ -3,11 +3,6 @@ package com.example.myapplication.timesheet.presentation.components.daysections
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material.icons.outlined.PlayArrow
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,8 +19,10 @@ import com.example.myapplication.utils.convertSecondsToTimeString
 fun TimeIntervalTrailingContent(
     timeInterval: TimeTrackerInterval,
     onTimeTrackerStarted: (String) -> Unit,
-    onDeleteClicked: (Int) -> Unit,
-    onEditClicked: (Int) -> Unit
+    onDeleteClicked: (String) -> Unit,
+    onEditClicked: (String) -> Unit,
+    onIntervalsSectionExpanded: (String) -> Unit,
+    numberOfIntervals: Int? = null
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -34,16 +31,15 @@ fun TimeIntervalTrailingContent(
             text = timeInterval.timeElapsed.convertSecondsToTimeString()
         )
         Spacer(modifier = Modifier.width(8.dp))
-        IconButton(onClick = { onTimeTrackerStarted(timeInterval.workingSubject) }) {
-            Icon(
-                imageVector = Icons.Outlined.PlayArrow,
-                contentDescription = null
+        if (numberOfIntervals != null) {
+            GroupedIntervalsSectionHeaderNumberBox(
+                numberOfIntervals = numberOfIntervals,
+                onIntervalsSectionExpanded = { onIntervalsSectionExpanded(timeInterval.id) }
             )
-        }
-        IconButton(onClick = { isExpanded = true }) {
-            Icon(
-                imageVector = Icons.Outlined.MoreVert,
-                contentDescription = null
+        } else {
+            TimeIntervalMenuIcons(
+                onTimeTrackerStarted = { onTimeTrackerStarted(timeInterval.workingSubject) },
+                onExpand = { isExpanded = true }
             )
         }
         TimeIntervalDropdownMenu(
