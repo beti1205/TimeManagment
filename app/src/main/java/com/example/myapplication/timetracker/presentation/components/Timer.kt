@@ -26,7 +26,7 @@ fun Timer(timeAmount: String, timeAmountInMilliseconds: Long) {
                 .fillMaxWidth(0.5f)
                 .aspectRatio(1f)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .background(MaterialTheme.colorScheme.secondaryContainer)
                 .align(Alignment.Center)
         )
         Text(

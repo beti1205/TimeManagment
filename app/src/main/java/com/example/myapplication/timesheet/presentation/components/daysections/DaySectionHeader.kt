@@ -12,6 +12,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,7 +34,7 @@ fun DaySectionHeader(
         headlineContent = { Text(daySection.dateHeader.reformatDate()) },
         shadowElevation = 2.dp,
         colors = ListItemDefaults.colors(
-            containerColor = Color.LightGray
+            containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
         trailingContent = {
             Row(verticalAlignment = Alignment.CenterVertically) {
