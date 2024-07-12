@@ -1,7 +1,12 @@
 package com.example.myapplication.timesheet.presentation
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -15,21 +20,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.myapplication.timesheet.domain.model.TimeTrackerInterval
-import com.example.myapplication.timesheet.presentation.model.TimeIntervalsSection
-import com.example.myapplication.timesheet.presentation.components.addeditdialog.AddEditTimeIntervalDialog
-import com.example.myapplication.timesheet.presentation.components.addeditdialog.DatePickerDialog
 import com.example.myapplication.timesheet.presentation.components.DeleteDialog
 import com.example.myapplication.timesheet.presentation.components.EmptyStateScreen
 import com.example.myapplication.timesheet.presentation.components.NoSearchResultsScreen
 import com.example.myapplication.timesheet.presentation.components.ScaffoldFloatingActionButton
 import com.example.myapplication.timesheet.presentation.components.SearchBar
-import com.example.myapplication.timesheet.presentation.components.daysections.DaySectionList
+import com.example.myapplication.timesheet.presentation.components.addeditdialog.AddEditTimeIntervalDialog
+import com.example.myapplication.timesheet.presentation.components.addeditdialog.DatePickerDialog
 import com.example.myapplication.timesheet.presentation.components.addeditdialog.TimePickerDialog
 import com.example.myapplication.timesheet.presentation.components.addeditdialog.addEditIntervalDialogHeader
 import com.example.myapplication.timesheet.presentation.components.datefilter.DateFilter
+import com.example.myapplication.timesheet.presentation.components.daysections.DaySectionList
 import com.example.myapplication.timesheet.presentation.model.AddEditIntervalDialogState
 import com.example.myapplication.timesheet.presentation.model.DaySection
 import com.example.myapplication.timesheet.presentation.model.SearchBarState
+import com.example.myapplication.timesheet.presentation.model.TimeIntervalsSection
 import java.time.Instant
 
 @Composable
@@ -126,7 +131,6 @@ fun TimesheetScreen(
         )
     }
 
-
     Scaffold(
         topBar = {
             SearchBar(
@@ -147,9 +151,11 @@ fun TimesheetScreen(
         floatingActionButton = {
             ScaffoldFloatingActionButton(onAddClicked = onAddClicked)
 
-        }
-    ) { contentPadding ->
-        Column(modifier = Modifier.padding(contentPadding)) {
+        },
+        modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
+    ) { innerPadding ->
+        Column(modifier = Modifier.consumeWindowInsets(innerPadding)) {
+            Spacer(Modifier.height(innerPadding.calculateTopPadding()))
             if (state.selectedFilter != DateFilter.All) {
                 DateFilter(
                     selectedFilter = state.selectedFilter,

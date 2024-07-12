@@ -1,6 +1,7 @@
 package com.example.myapplication.timesheet.presentation.components.bottomsheet
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -25,7 +26,8 @@ fun DateBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismissBottomSheet,
         sheetState = sheetState,
-        dragHandle = null
+        dragHandle = null,
+        windowInsets = WindowInsets(0, 0, 0, 0)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             DateBottomSheetHeader(
