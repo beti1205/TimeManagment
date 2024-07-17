@@ -2,9 +2,14 @@ package com.example.myapplication.timetracker.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -79,49 +84,58 @@ fun TimeTrackerScreen(
     onNavigateToTimeSheet: () -> Unit,
     onTypeSelected: (TimeAdjustment) -> Unit
 ) {
-    TimeInterval(
-        startTime = startTime,
-        showEndTime = showEndTime,
-        endTime = endTime
-    )
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Timer(timeAmount = timeAmount, timeAmountInMilliseconds = timeAmountInMilliseconds)
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            TimeAdjustmentChips(
-                selectedTimeAdjustment = selectedTimeAdjustment,
-                onTypeSelected = onTypeSelected,
-                chipsEnabled = chipsEnabled
+    Scaffold(
+        modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
+    ) { innerPadding ->
+        Column(modifier = Modifier.consumeWindowInsets(innerPadding)) {
+            TimeInterval(
+                startTime = startTime,
+                showEndTime = showEndTime,
+                endTime = endTime
             )
-            val focusManager = LocalFocusManager.current
-            SubjectDropDown(
-                subject = workingSubject,
-                filteredSubjects = filteredSubjects,
-                isSubjectChangeEnabled = !isActive,
-                isSubjectErrorOccurred = isSubjectErrorOccurred,
-                onWorkingSubjectChanged = onWorkingSubjectChanged,
-                clearFocus = { focusManager.clearFocus() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp)
-            )
-            ActionButtonRow(
-                workingSubject = workingSubject,
-                clearDropDownFocus = { focusManager.clearFocus() },
-                onTimerToggled = onTimerToggled,
-                onSubjectErrorChanged = onSubjectErrorChanged,
-                isActive = isActive,
-                onResetClicked = onResetClicked
-            )
-            TimesheetButton(onNavigateToTimeSheet)
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Timer(
+                    timeAmount = timeAmount,
+                    timeAmountInMilliseconds = timeAmountInMilliseconds
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    TimeAdjustmentChips(
+                        selectedTimeAdjustment = selectedTimeAdjustment,
+                        onTypeSelected = onTypeSelected,
+                        chipsEnabled = chipsEnabled
+                    )
+                    val focusManager = LocalFocusManager.current
+                    SubjectDropDown(
+                        subject = workingSubject,
+                        filteredSubjects = filteredSubjects,
+                        isSubjectChangeEnabled = !isActive,
+                        isSubjectErrorOccurred = isSubjectErrorOccurred,
+                        onWorkingSubjectChanged = onWorkingSubjectChanged,
+                        clearFocus = { focusManager.clearFocus() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp)
+                    )
+                    ActionButtonRow(
+                        workingSubject = workingSubject,
+                        clearDropDownFocus = { focusManager.clearFocus() },
+                        onTimerToggled = onTimerToggled,
+                        onSubjectErrorChanged = onSubjectErrorChanged,
+                        isActive = isActive,
+                        onResetClicked = onResetClicked
+                    )
+                    TimesheetButton(onNavigateToTimeSheet)
+                }
+            }
         }
     }
 }

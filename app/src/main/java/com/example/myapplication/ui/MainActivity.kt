@@ -18,13 +18,13 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.ui.theme.MyApplicationTheme
 import com.example.myapplication.services.TimeTrackerService
 import com.example.myapplication.timesheet.presentation.navigateToTimesheetScreen
 import com.example.myapplication.timesheet.presentation.timesheetScreen
 import com.example.myapplication.timetracker.domain.timetracker.TimeTracker
 import com.example.myapplication.timetracker.presentation.timeTrackerScreen
 import com.example.myapplication.timetracker.presentation.timeTrackerScreenRoute
+import com.example.myapplication.ui.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApplicationTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize().systemBarsPadding(),
+                    modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
