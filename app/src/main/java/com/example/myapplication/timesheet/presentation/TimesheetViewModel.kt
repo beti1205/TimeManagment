@@ -251,7 +251,7 @@ class TimesheetViewModel @Inject constructor(
     }
 
     fun onSaveClicked() {
-        saveFormattedTime()
+        saveFormattedDate()
         addEditIntervalDialogState.value?.let { editState ->
             if (editState.id != null) {
                 editTimeInterval()
@@ -289,7 +289,7 @@ class TimesheetViewModel @Inject constructor(
         return endTime
     }
 
-    private fun saveFormattedTime() {
+    private fun saveFormattedDate() {
         addEditIntervalDialogState.value = addEditIntervalDialogState.value?.copy(
             date = addEditIntervalDialogState.value!!.date.formatDateWithDash()
         )
