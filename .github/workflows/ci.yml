@@ -25,7 +25,7 @@ jobs:
         run: ./gradlew lint
         continue-on-error: false
 
-  unit_tests:
+  unit-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -40,7 +40,7 @@ jobs:
       - name: Unit tests
         run: ./gradlew testDebugUnitTest
 
-  android_tests:
+  android-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
