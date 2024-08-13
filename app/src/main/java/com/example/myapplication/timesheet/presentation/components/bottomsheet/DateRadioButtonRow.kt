@@ -1,5 +1,6 @@
 package com.example.myapplication.timesheet.presentation.components.bottomsheet
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
@@ -21,15 +22,19 @@ fun DateRadioButtonRow(
     onDismissBottomSheet: () -> Unit,
     onSearchToggled: () -> Unit
 ) {
-    if (date !is DateFilter.CustomRange)
-        Row(verticalAlignment = Alignment.CenterVertically) {
+    if (date !is DateFilter.CustomRange) {
+        val onClick = {
+            onSelectedDate(date)
+            onDismissBottomSheet()
+            onSearchToggled()
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.clickable { onClick() }
+        ) {
             RadioButton(
                 selected = date == selectedFilter,
-                onClick = {
-                    onSelectedDate(date)
-                    onDismissBottomSheet()
-                    onSearchToggled()
-                }
+                onClick = onClick
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
@@ -37,4 +42,5 @@ fun DateRadioButtonRow(
                 style = MaterialTheme.typography.bodyMedium
             )
         }
+    }
 }
