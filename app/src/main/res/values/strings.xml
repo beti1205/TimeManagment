@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">TimeWise</string>
     <string name="delete_warning_title">Are you sure?</string>
     <string name="delete_warning_body">This operation cannot be reverted</string>
     <string name="delete_confirm_button">Confirm</string>
