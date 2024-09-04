@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.Manifest
+import android.os.Build
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.filter
@@ -34,7 +35,13 @@ import java.time.temporal.ChronoUnit
 class TimeIntervalEndToEndTest {
 
     @get:Rule(order = 0)
-    val grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.POST_NOTIFICATIONS)
+    val grantPermissionRule =
+        if (Build.VERSION.SDK_INT >= 33) {
+            GrantPermissionRule.grant(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            GrantPermissionRule.grant()
+        }
+
 
     @get:Rule(order = 1)
     val hiltRule = HiltAndroidRule(this)
