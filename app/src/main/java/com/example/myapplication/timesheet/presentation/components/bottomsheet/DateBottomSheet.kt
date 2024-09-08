@@ -27,7 +27,7 @@ fun DateBottomSheet(
         onDismissRequest = onDismissBottomSheet,
         sheetState = sheetState,
         dragHandle = null,
-        windowInsets = WindowInsets(0, 0, 0, 0)
+        contentWindowInsets = { WindowInsets(0, 0, 0, 0) }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             DateBottomSheetHeader(
