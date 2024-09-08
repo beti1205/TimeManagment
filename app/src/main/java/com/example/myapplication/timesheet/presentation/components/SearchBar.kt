@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -49,30 +50,36 @@ fun SearchBar(
     val focusRequester = remember { FocusRequester() }
 
     SearchBar(
-        query = searchText,
-        onQueryChange = onSearchTextChanged,
-        onSearch = onSearchTextChanged,
-        active = isSearching,
-        onActiveChange = { onSearchToggled() },
-        placeholder = { Text(stringResource(R.string.search_bar_search_placeholder)) },
-        leadingIcon = {
-            SearchBarLeadingIconButton(
-                isSearching = isSearching,
-                selectedFilter = selectedFilter,
-                searchText = searchText,
-                onSearchToggled = onSearchToggled,
-                onSearchTextChanged = onSearchTextChanged,
-                onSelectedFilterChanged = onSelectedFilterChanged,
-                onFocusRequested = { focusRequester.requestFocus() }
+        inputField = {
+            SearchBarDefaults.InputField(
+                query = searchText,
+                onQueryChange = onSearchTextChanged,
+                onSearch = onSearchTextChanged,
+                expanded = isSearching,
+                onExpandedChange = { onSearchToggled() },
+                placeholder = { Text(stringResource(R.string.search_bar_search_placeholder)) },
+                leadingIcon = {
+                    SearchBarLeadingIconButton(
+                        isSearching = isSearching,
+                        selectedFilter = selectedFilter,
+                        searchText = searchText,
+                        onSearchToggled = onSearchToggled,
+                        onSearchTextChanged = onSearchTextChanged,
+                        onSelectedFilterChanged = onSelectedFilterChanged,
+                        onFocusRequested = { focusRequester.requestFocus() }
+                    )
+                },
+                trailingIcon = {
+                    SearchBarClearButton(
+                        searchText = searchText,
+                        onSearchTextChanged = onSearchTextChanged,
+                        onFocusRequested = { focusRequester.requestFocus() }
+                    )
+                },
             )
         },
-        trailingIcon = {
-            SearchBarClearButton(
-                searchText = searchText,
-                onSearchTextChanged = onSearchTextChanged,
-                onFocusRequested = { focusRequester.requestFocus() }
-            )
-        },
+        expanded = isSearching,
+        onExpandedChange = { onSearchToggled() },
         modifier = Modifier
             .then(
                 if (!isSearching) Modifier.padding(start = 12.dp, end = 12.dp) else Modifier

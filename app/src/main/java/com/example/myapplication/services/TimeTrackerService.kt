@@ -8,8 +8,10 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.myapplication.R
 import com.example.myapplication.timetracker.domain.timetracker.TimeTracker
 import com.example.myapplication.timetracker.domain.timetracker.TimeTrackerState
@@ -18,6 +20,7 @@ import com.example.myapplication.ui.MainActivity
 import com.example.myapplication.utils.convertSecondsToTimeString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -64,9 +67,11 @@ class TimeTrackerService : LifecycleService() {
 
         startForeground(1, notification)
 
-        lifecycleScope.launchWhenStarted {
-            timeTracker.state.collectLatest { state ->
-                updateState(state)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                timeTracker.state.collectLatest { state ->
+                    updateState(state)
+                }
             }
         }
     }
