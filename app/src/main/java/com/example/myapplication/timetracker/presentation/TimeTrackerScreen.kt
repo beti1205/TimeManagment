@@ -2,13 +2,17 @@ package com.example.myapplication.timetracker.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -87,14 +91,21 @@ fun TimeTrackerScreen(
     Scaffold(
         modifier = Modifier.windowInsetsPadding(WindowInsets.statusBars)
     ) { innerPadding ->
-        Column(modifier = Modifier.consumeWindowInsets(innerPadding)) {
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .imePadding()
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
             TimeInterval(
                 startTime = startTime,
                 showEndTime = showEndTime,
                 endTime = endTime
             )
+            Spacer(modifier = Modifier.weight(1f))
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -136,6 +147,7 @@ fun TimeTrackerScreen(
                     TimesheetButton(onNavigateToTimeSheet)
                 }
             }
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }

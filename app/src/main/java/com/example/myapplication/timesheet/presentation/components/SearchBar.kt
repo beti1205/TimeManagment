@@ -29,6 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 import com.example.myapplication.timesheet.presentation.DateFilter
@@ -48,6 +50,7 @@ fun SearchBar(
     onSelectedFilterChanged: (DateFilter) -> Unit
 ) {
     val focusRequester = remember { FocusRequester() }
+    val searchPlaceholder = stringResource(R.string.search_bar_search_placeholder)
 
     SearchBar(
         inputField = {
@@ -57,7 +60,7 @@ fun SearchBar(
                 onSearch = onSearchTextChanged,
                 expanded = isSearching,
                 onExpandedChange = { onSearchToggled() },
-                placeholder = { Text(stringResource(R.string.search_bar_search_placeholder)) },
+                placeholder = { Text(searchPlaceholder) },
                 leadingIcon = {
                     SearchBarLeadingIconButton(
                         isSearching = isSearching,
@@ -76,6 +79,7 @@ fun SearchBar(
                         onFocusRequested = { focusRequester.requestFocus() }
                     )
                 },
+                modifier = Modifier.semantics { contentDescription = searchPlaceholder }
             )
         },
         expanded = isSearching,

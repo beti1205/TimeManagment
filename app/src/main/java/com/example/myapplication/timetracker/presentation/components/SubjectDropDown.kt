@@ -51,7 +51,6 @@ fun SubjectDropDown(
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor(MenuAnchorType.PrimaryEditable)
-                .imePadding()
                 .semantics { contentDescription = description },
             textStyle = TextStyle.Default.copy(
                 fontSize = 14.sp,
