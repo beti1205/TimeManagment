@@ -10,8 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.R
 import com.example.myapplication.timetracker.presentation.TimeAdjustment
+import com.example.myapplication.timetracker.presentation.getTypeName
 
 @Composable
 fun TimeAdjustmentChips(
@@ -27,11 +27,7 @@ fun TimeAdjustmentChips(
     ) {
         TimeAdjustment.entries.forEach { chip ->
             FilterChip(
-                label = {
-                    Text(
-                        getTypeName(chip)
-                    )
-                },
+                label = { Text(stringResource(chip.getTypeName())) },
                 selected = selectedTimeAdjustment == chip,
                 onClick = { onTypeSelected(chip) },
                 enabled = chipsEnabled
@@ -39,14 +35,3 @@ fun TimeAdjustmentChips(
         }
     }
 }
-
-@Composable
-fun getTypeName(chip: TimeAdjustment) =
-    when (chip) {
-        TimeAdjustment.PLUS_5 -> stringResource(R.string.plus_5)
-        TimeAdjustment.PLUS_15 -> stringResource(R.string.plus_15)
-        TimeAdjustment.PLUS_30 -> stringResource(R.string.plus_30)
-        TimeAdjustment.MINUS_5 -> stringResource(R.string.minus_5)
-        TimeAdjustment.MINUS_15 -> stringResource(R.string.minus_15)
-        TimeAdjustment.MINUS_30 -> stringResource(R.string.minus_30)
-    }

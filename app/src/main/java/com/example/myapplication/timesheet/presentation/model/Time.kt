@@ -67,3 +67,7 @@ fun Time.formatToInstantWithAdditionalDay(date: String): Instant {
 
     return ldt.atZone(ZoneId.systemDefault()).toInstant()
 }
+
+fun Time.toStr(): String {
+    return "${this.hours}:${this.minutes}"
+}

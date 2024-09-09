@@ -8,7 +8,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 
 @Composable
 fun StartStopButton(
@@ -31,9 +33,15 @@ fun StartStopButton(
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 7.dp)
     ) {
         if (!isActive) {
-            Icon(imageVector = Icons.Outlined.PlayArrow, contentDescription = null)
+            Icon(
+                imageVector = Icons.Outlined.PlayArrow,
+                contentDescription = stringResource(R.string.start_button)
+            )
         } else {
-            Icon(imageVector = Icons.Outlined.Pause, contentDescription = null)
+            Icon(
+                imageVector = Icons.Outlined.Pause,
+                contentDescription = stringResource(R.string.stop_button)
+            )
         }
     }
 }

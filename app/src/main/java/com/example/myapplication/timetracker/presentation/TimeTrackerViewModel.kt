@@ -169,11 +169,3 @@ class TimeTrackerViewModel @Inject constructor(
     }
 }
 
-enum class TimeAdjustment(val amount: Int) {
-    MINUS_30(-30),
-    MINUS_15(-15),
-    MINUS_5(-5),
-    PLUS_5(5),
-    PLUS_15(15),
-    PLUS_30(30)
-}

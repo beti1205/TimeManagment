@@ -18,6 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -38,6 +40,7 @@ fun SubjectDropDown(
 ) {
 
     var expanded by remember { mutableStateOf(false) }
+    val description = stringResource(R.string.subject_field)
 
     ExposedDropdownMenuBox(
         modifier = modifier,
@@ -48,7 +51,7 @@ fun SubjectDropDown(
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor(MenuAnchorType.PrimaryEditable)
-                .imePadding(),
+                .semantics { contentDescription = description },
             textStyle = TextStyle.Default.copy(
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Light
